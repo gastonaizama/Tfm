@@ -55,6 +55,11 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
   - Ante un 429, reintentar con espera creciente (20, 40 s). Si una consulta falla, la revisión continúa y el error queda en el diagnóstico de fuentes.
   - Pedir los artículos **ordenados por relevancia** (`sort=HybridRel`). Como la API corta en 250, conviene que esos 250 sean los más pertinentes y no simplemente los más recientes.
 
+### D8b. En el modo en vivo, los feeds RSS son la fuente principal y GDELT es complementario
+- **Diagnóstico (12/10/2026, comando `python -m monitor diagnostico`):** de 5 consultas de prueba a GDELT desde GitHub Actions, 3 fueron rechazadas por exceso de uso (HTTP 429), aun con 10 segundos entre consultas. Las que respondieron devolvieron pocos artículos en las últimas 24 horas y 7 días. En la misma ejecución, los 6 feeds RSS respondieron sin errores.
+- **Decisión:** el semáforo en vivo se apoya en los RSS. GDELT se consulta en cada revisión con un solo reintento, para no demorarla. Si falla, el error queda en el diagnóstico de fuentes y la revisión continúa.
+- **Consecuencia para la memoria:** GDELT resulta mucho más valioso para el análisis **histórico** (cobertura global y retrospectiva) que para la **alerta en tiempo real**, donde su límite de uso desde infraestructura compartida lo hace poco fiable.
+
 ### D9. El histórico de GDELT se descarga por partes y de forma reanudable
 - **Medición:** las consultas geopolíticas llegan al tope de 250 artículos incluso en tramos de 3 días alrededor de hechos clave (febrero de 2024). Las consultas ciber traen entre 0 y 4 artículos por tramo.
 - **Decisión:**
