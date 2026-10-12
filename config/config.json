@@ -1,0 +1,102 @@
+{
+  "_ayuda": "Archivo central de configuración. Se puede editar desde la web de GitHub (icono del lápiz). Los textos se comparan sin tildes y sin distinguir mayúsculas.",
+
+  "semaforo": {
+    "ventana_vigilancia_dias": 7,
+    "umbral_puntaje_detonante": 2,
+    "min_fuentes_distintas_por_dia": 2,
+    "dias_modo_vivo": 30
+  },
+
+  "palabras_clave": {
+    "pais_objetivo": ["argentina", "argentino", "argentina's", "argentine", "buenos aires", "casa rosada", "milei", "gob.ar"],
+
+    "geopoliticas": {
+      "israel": 1,
+      "israeli": 1,
+      "israeli's": 1,
+      "jerusalen": 1,
+      "jerusalem": 1,
+      "palestina": 1,
+      "palestino": 1,
+      "palestine": 1,
+      "palestinian": 1,
+      "gaza": 1,
+      "hamas": 2,
+      "hezbola": 2,
+      "hezbollah": 2,
+      "iran": 2,
+      "irani": 2,
+      "iranian": 2,
+      "embajada": 1,
+      "embassy": 1,
+      "amia": 2,
+      "onu": 1,
+      "naciones unidas": 1,
+      "united nations": 1
+    },
+
+    "ciberneticas": [
+      "hackeo", "hackeado", "hackeada", "hackeados", "hackers", "hacker", "hackearon", "hackean", "hacked", "hack",
+      "ciberataque", "ataque informatico", "cyberattack", "cyber attack",
+      "filtracion de datos", "filtraron datos", "datos filtrados", "base de datos filtrada", "data leak", "data breach", "leaked data",
+      "ataque a sitio web", "defacement", "defaced", "desfiguracion", "desfiguraron",
+      "sitio caido", "sitios caidos", "caida del sitio", "ddos", "denegacion de servicio", "denial of service",
+      "hacktivista", "hacktivistas", "hacktivist", "hacktivists", "hacktivismo", "hacktivism",
+      "ransomware", "ciberdelincuentes",
+      "gob.ar",
+      "cyber dragonz", "dragonz",
+      "lulzsec muslims", "lulzsec",
+      "ripper sec", "anonymous sudan", "mysterious team", "team insane pk"
+    ],
+
+    "grupos_hacktivistas": [
+      "cyber dragonz", "lulzsec muslims", "lulzsec", "rem", "ripper sec", "anonymous sudan", "mysterious team", "team insane pk"
+    ],
+
+    "_nota_rem": "REM es una sigla corta y ambigua: solo cuenta como término cibernético si aparece como palabra completa en MAYÚSCULAS (ver 'terminos_sensibles_mayusculas').",
+    "terminos_sensibles_mayusculas": ["REM"]
+  },
+
+  "fuentes_rss": [
+    {"nombre": "The Record", "url": "https://therecord.media/feed", "tipo": "ciber", "idioma": "en", "activa": true},
+    {"nombre": "BleepingComputer", "url": "https://www.bleepingcomputer.com/feed/", "tipo": "ciber", "idioma": "en", "activa": true},
+    {"nombre": "The Hacker News", "url": "https://feeds.feedburner.com/TheHackersNews", "tipo": "ciber", "idioma": "en", "activa": true},
+    {"nombre": "WeLiveSecurity (ESET)", "url": "https://www.welivesecurity.com/es/rss/feed/", "tipo": "ciber", "idioma": "es", "activa": true},
+    {"nombre": "Infobae", "url": "https://www.infobae.com/arc/outboundfeeds/rss/", "tipo": "medio_ar", "idioma": "es", "activa": true},
+    {"nombre": "La Nación", "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml", "tipo": "medio_ar", "idioma": "es", "activa": true}
+  ],
+
+  "gdelt": {
+    "url": "https://api.gdeltproject.org/api/v2/doc/doc",
+    "consultas_geopoliticas": [
+      "(Argentina OR argentino OR Milei) (Israel OR Hamas OR Iran OR AMIA OR embajada OR Palestina)",
+      "(Argentina OR Argentine OR Milei) (Israel OR Hamas OR Iran OR AMIA OR embassy OR Palestinian)"
+    ],
+    "consultas_ciber": [
+      "(Argentina OR argentino OR \"gob.ar\") (hackeo OR hackers OR ciberataque OR hacktivistas OR filtración)",
+      "(Argentina OR Argentine) (hacktivists OR cyberattack OR DDoS OR defacement OR \"data leak\")"
+    ],
+    "ventana_consulta_vivo": "3d",
+    "max_resultados": 250,
+    "pausa_entre_consultas_seg": 6
+  },
+
+  "historico": {
+    "inicio": "2023-08-01",
+    "fin": "2024-07-31",
+    "dias_por_tramo": 3
+  },
+
+  "almacenamiento": {
+    "dias_retencion_noticias_vivo": 400
+  },
+
+  "ia": {
+    "_nota": "FASE 2 – todavía no implementada. Cuando se active, la API key se leerá del secreto ANTHROPIC_API_KEY de GitHub, nunca del código.",
+    "activada": false,
+    "modelo_clasificador": "claude-haiku-5-5",
+    "modelo_informe": "claude-sonnet-5-5",
+    "generar_informe_solo_en_rojo": true
+  }
+}

@@ -1,0 +1,68 @@
+{
+ "T1491.002": {
+  "nombre": "External Defacement",
+  "tacticas": [
+   "impact"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1491/002"
+ },
+ "T1190": {
+  "nombre": "Exploit Public-Facing Application",
+  "tacticas": [
+   "initial-access"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1190"
+ },
+ "T1567": {
+  "nombre": "Exfiltration Over Web Service",
+  "tacticas": [
+   "exfiltration"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1567"
+ },
+ "T1566": {
+  "nombre": "Phishing",
+  "tacticas": [
+   "initial-access"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1566"
+ },
+ "T1078": {
+  "nombre": "Valid Accounts",
+  "tacticas": [
+   "stealth",
+   "persistence",
+   "privilege-escalation",
+   "initial-access"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1078"
+ },
+ "T1486": {
+  "nombre": "Data Encrypted for Impact",
+  "tacticas": [
+   "impact"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1486"
+ },
+ "T1499": {
+  "nombre": "Endpoint Denial of Service",
+  "tacticas": [
+   "impact"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1499"
+ },
+ "T1213": {
+  "nombre": "Data from Information Repositories",
+  "tacticas": [
+   "collection"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1213"
+ },
+ "T1498": {
+  "nombre": "Network Denial of Service",
+  "tacticas": [
+   "impact"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1498"
+ }
+}

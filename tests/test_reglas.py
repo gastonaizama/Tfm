@@ -1,0 +1,84 @@
+"""Pruebas de las reglas (se ejecutan con: python -m unittest)."""
+import unittest
+from datetime import date
+
+from monitor import semaforo
+from monitor.clasificador import Clasificador
+from monitor.config import cargar_config, cargar_mapeo_mitre
+
+CFG = cargar_config()
+CLF = Clasificador(CFG, cargar_mapeo_mitre())
+SEM = {"ventana_vigilancia_dias": 7, "min_fuentes_distintas_por_dia": 2}
+
+
+def ev(id_, dia, carril, fuente="X", origen="rss"):
+    return {"id": id_, "dia": dia, "carril": carril, "fuente": fuente, "origen": origen}
+
+
+class TestClasificador(unittest.TestCase):
+    def test_hecho_geopolitico(self):
+        c = CLF.clasificar("Milei anunció que trasladará la embajada argentina a Jerusalén")
+        self.assertEqual(CLF.carril(c), "geo")
+
+    def test_geo_debil_se_descarta(self):
+        c = CLF.clasificar("Argentina votó en la ONU una resolución sobre pesca")
+        self.assertIsNone(CLF.carril(c))
+
+    def test_sin_argentina_no_cuenta(self):
+        c = CLF.clasificar("Hamás e Irán: nueva escalada en Medio Oriente")
+        self.assertEqual(c["puntaje_geo"], 0)
+
+    def test_ataque_defacement(self):
+        c = CLF.clasificar("Hacktivistas pro Palestina hackearon el sitio de un municipio argentino",
+                           "El defacement mostró mensajes contra Israel")
+        self.assertEqual(CLF.carril(c), "ataque")
+        self.assertIn("T1491.002", c["tecnicas"])
+
+    def test_ataque_ddos_gob_ar(self):
+        c = CLF.clasificar("Cyber Dragonz reivindica DDoS contra portales gob.ar")
+        self.assertTrue(c["es_ataque"])
+        self.assertIn("cyber dragonz", c["grupos"])
+        self.assertIn("T1498", c["tecnicas"])
+
+    def test_rem_solo_en_mayusculas(self):
+        self.assertIn("REM", CLF.clasificar("El grupo REM atacó sitios de Argentina")["grupos"])
+        self.assertNotIn("REM", CLF.clasificar("el sueño rem en argentina")["terminos_ciber"])
+
+    def test_ciber_sin_argentina(self):
+        self.assertFalse(CLF.clasificar("Ransomware attack hits hospital in Germany")["es_ataque"])
+
+
+class TestSemaforo(unittest.TestCase):
+    def test_verde_sin_detonantes(self):
+        r = semaforo.calcular([ev("a", "2024-02-01", "ataque")], SEM, date(2024, 2, 1))
+        self.assertEqual(r["actual"]["nivel"], "verde")
+        self.assertEqual(r["alertas"][0]["nivel"], "info")
+
+    def test_una_sola_fuente_no_alcanza(self):
+        r = semaforo.calcular([ev("g1", "2024-02-06", "geo", "A"), ev("g2", "2024-02-06", "geo", "A")], SEM, date(2024, 2, 7))
+        self.assertEqual(r["actual"]["nivel"], "verde")
+
+    def test_amarillo_y_rojo(self):
+        evs = [ev("g1", "2024-02-06", "geo", "A"), ev("g2", "2024-02-06", "geo", "B"), ev("a1", "2024-02-09", "ataque")]
+        self.assertEqual(semaforo.calcular(evs, SEM, date(2024, 2, 8))["actual"]["nivel"], "amarillo")
+        self.assertEqual(semaforo.calcular(evs, SEM, date(2024, 2, 10))["actual"]["nivel"], "rojo")
+        self.assertEqual(semaforo.calcular(evs, SEM, date(2024, 2, 14))["actual"]["nivel"], "verde")
+
+    def test_hecho_clave_basta_solo(self):
+        r = semaforo.calcular([ev("h", "2024-04-11", "geo", origen="hecho_clave")], SEM, date(2024, 4, 12))
+        self.assertEqual(r["actual"]["nivel"], "amarillo")
+
+    def test_ventanas_se_fusionan(self):
+        evs = [ev("h1", "2024-04-11", "geo", origen="hecho_clave"), ev("h2", "2024-04-13", "geo", origen="hecho_clave")]
+        r = semaforo.calcular(evs, SEM, date(2024, 4, 19))
+        self.assertEqual(len(r["periodos"]), 1)
+        self.assertEqual(r["periodos"][0]["fin"], "2024-04-20")
+
+    def test_ventana_configurable(self):
+        evs = [ev("h", "2024-04-11", "geo", origen="hecho_clave")]
+        r = semaforo.calcular(evs, {**SEM, "ventana_vigilancia_dias": 3}, date(2024, 4, 16))
+        self.assertEqual(r["actual"]["nivel"], "verde")
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,2 @@
+id,fecha,grupo,objetivo,dominio_objetivo,sector,tipo_ataque,tecnicas_mitre,descripcion,motivacion_declarada,fuente_nombre,fuente_url,confianza,verificado
+EJEMPLO-001,2024-02-08,Nombre del grupo,Organismo atacado,ejemplo.gob.ar,gobierno,defacement,T1491.002,"FILA DE EJEMPLO: borrala o reemplazala. Las filas cuyo id empieza con EJEMPLO se ignoran.",pro-Palestina / respuesta al traslado de la embajada,Medio o canal de Telegram,https://ejemplo.com/noticia,media,no

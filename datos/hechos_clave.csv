@@ -1,0 +1,9 @@
+id,fecha,titulo,descripcion,categoria,fuente_nombre,fuente_url,confianza,verificado
+HC-001,2023-10-07,Ataque de Hamás contra Israel,"Ataque de Hamás en el sur de Israel; hay víctimas y rehenes con nacionalidad argentina.",conflicto,,,alta,no
+HC-002,2023-11-19,Milei gana el balotaje presidencial,"El presidente electo reafirma su alineamiento con Israel y EE. UU.",politica_exterior,,,media,no
+HC-003,2023-12-10,Asunción de Javier Milei,"Inicio del nuevo gobierno con una política exterior de acercamiento a Israel.",politica_exterior,,,media,no
+HC-004,2024-02-06,Milei visita Israel y anuncia el traslado de la embajada a Jerusalén,"Durante su visita oficial a Israel, el presidente anuncia la intención de trasladar la embajada argentina a Jerusalén.",politica_exterior,,,alta,no
+HC-005,2024-04-11,Fallo de Casación sobre el atentado a la AMIA,"La Cámara Federal de Casación Penal atribuye a Irán la responsabilidad por el atentado a la AMIA (1994).",judicial,,,alta,no
+HC-006,2024-04-13,Ataque de Irán contra Israel,"Irán lanza drones y misiles contra Israel; el gobierno argentino expresa su apoyo a Israel.",conflicto,,,alta,no
+HC-007,2024-07-12,Argentina declara a Hamás organización terrorista,"El gobierno incluye a Hamás en el registro de organizaciones terroristas.",politica_exterior,,,media,no
+HC-008,2024-07-18,30.º aniversario del atentado a la AMIA,"Actos por el 30.º aniversario del atentado; fuerte presencia del tema Irán/Israel en la agenda.",aniversario,,,alta,no

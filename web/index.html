@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monitor Ciber-Geopolítico AR</title>
+  <meta name="description" content="Alerta temprana de hacktivismo contra Argentina a partir de hechos geopolíticos (TFM – Máster en Cyber Threat Intelligence, KSchool).">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div>
+      <h1>Monitor Ciber-Geopolítico · Argentina</h1>
+      <p class="sub">Alerta temprana de hacktivismo pro-Palestina tras hechos geopolíticos · Fase 1 (reglas, sin IA)</p>
+    </div>
+    <p class="actualizado" id="actualizado">Cargando datos…</p>
+  </header>
+
+  <section class="controles" aria-label="Selector de fechas">
+    <div class="modo" role="group" aria-label="Modo">
+      <button type="button" id="btn-vivo" class="activo" aria-pressed="true">En vivo</button>
+      <button type="button" id="btn-hist" aria-pressed="false">Histórico</button>
+    </div>
+    <label>Desde <input type="date" id="desde"></label>
+    <label>Hasta <input type="date" id="hasta"></label>
+    <button type="button" id="btn-caso" class="secundario">Caso de estudio (ago 2023 – jul 2024)</button>
+  </section>
+
+  <main>
+    <section class="tarjeta semaforo-tarjeta" aria-live="polite">
+      <div class="semaforo" id="semaforo" role="img" aria-label="Semáforo">
+        <span class="luz verde"></span><span class="luz amarillo"></span><span class="luz rojo"></span>
+      </div>
+      <div class="semaforo-texto">
+        <p class="etiqueta" id="sem-contexto">Nivel actual</p>
+        <p class="nivel" id="sem-nivel">—</p>
+        <p id="sem-detalle" class="detalle"></p>
+      </div>
+      <dl class="resumen" id="resumen"></dl>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-titulo">
+        <h2>Línea de tiempo</h2>
+        <ul class="leyenda">
+          <li><span class="mk geo"></span>Hechos geopolíticos (noticias por día)</li>
+          <li><span class="mk ataque"></span>Ataques contra objetivos argentinos</li>
+          <li><span class="mk curado"></span>Carga manual (hecho clave / incidente)</li>
+          <li><span class="mk banda-a"></span>Ventana de vigilancia</li>
+          <li><span class="mk banda-r"></span>Ventana con ataque</li>
+        </ul>
+      </div>
+      <div id="linea" class="linea"></div>
+      <div id="tooltip" class="tooltip" role="status" hidden></div>
+      <div id="detalle-dia" class="detalle-dia" hidden></div>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-titulo">
+        <h2>Alertas</h2>
+        <span class="contador" id="contador-alertas"></span>
+      </div>
+      <ol id="alertas" class="alertas"></ol>
+    </section>
+
+    <section class="tarjeta" id="informe-ia" hidden>
+      <h2>Informe de inteligencia (IA)</h2>
+      <div id="informe-contenido"></div>
+    </section>
+
+    <details class="tarjeta">
+      <summary><h2>Tabla de eventos del periodo</h2></summary>
+      <div class="tabla-scroll"><table id="tabla"><thead><tr><th>Fecha</th><th>Carril</th><th>Título</th><th>Fuente</th><th>MITRE</th></tr></thead><tbody></tbody></table></div>
+    </details>
+
+    <details class="tarjeta">
+      <summary><h2>Estado de las fuentes y metodología</h2></summary>
+      <div id="fuentes"></div>
+      <div id="metodologia" class="metodologia"></div>
+    </details>
+  </main>
+
+  <footer>
+    TFM · Máster en Cyber Threat Intelligence (KSchool) ·
+    <a href="https://github.com/gastonaizama/Tfm">Código fuente</a> ·
+    Datos: GDELT Project, feeds RSS públicos, MITRE ATT&amp;CK®
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

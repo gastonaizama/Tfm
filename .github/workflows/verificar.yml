@@ -1,0 +1,53 @@
+# Verificación para ramas de desarrollo y pull requests: pruebas + ejecución real
+# contra las fuentes, SIN guardar nada en el repositorio. El resultado (web con datos)
+# queda como "artifact" descargable en la pestaña Actions.
+name: Verificar cambios
+
+on:
+  push:
+    branches: ["claude/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Pruebas de las reglas
+        run: python -m unittest -v
+      - name: Histórico de GDELT (solo un mes, como prueba)
+        if: hashFiles('datos/gdelt_historico.json') == ''
+        env:
+          MONITOR_HIST_INICIO: "2024-02-01"
+          MONITOR_HIST_FIN: "2024-02-29"
+        run: python -m monitor historico
+      - name: Revisión en vivo
+        run: python -m monitor actualizar
+      - name: Resumen
+        run: |
+          python - <<'PY'
+          import json
+          d = json.load(open("web/datos.json"))
+          print("Nivel actual:", d["actual"]["nivel"])
+          for f in d["fuentes"]["fuentes"]:
+              print(("OK   " if f["ok"] else "FALLA"), f["nombre"], f["items"], f.get("detalle", ""))
+          print("Eventos:", len(d["eventos"]), "| Periodos:", len(d["periodos"]), "| Alertas:", len(d["alertas"]))
+          for e in [e for e in d["eventos"] if e["carril"] == "ataque"][-15:]:
+              print("ATAQUE", e["dia"], e["fuente"], e["titulo"][:110], e.get("tecnicas"))
+          for e in [e for e in d["eventos"] if e["carril"] == "geo"][-25:]:
+              print("GEO   ", e["dia"], e["fuente"], e["puntaje_geo"] if "puntaje_geo" in e else "", e["titulo"][:110])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-con-datos
+          path: web

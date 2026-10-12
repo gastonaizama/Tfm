@@ -1,0 +1,40 @@
+{
+  "_ayuda": "Reglas para asignar técnicas MITRE ATT&CK (Enterprise) a una noticia de ataque. Si el texto contiene alguno de los 'terminos', se asignan las 'tecnicas'. Los nombres oficiales de cada técnica se descargan automáticamente de MITRE en cada ejecución.",
+  "reglas": [
+    {
+      "categoria": "Desfiguración de sitio web (defacement)",
+      "terminos": ["defacement", "defaced", "desfiguracion", "desfiguraron", "ataque a sitio web", "modificaron la pagina", "mensaje en la portada", "hackearon la pagina", "hackearon el sitio", "sitio hackeado", "pagina hackeada", "web hackeada"],
+      "tecnicas": ["T1491.002"]
+    },
+    {
+      "categoria": "Denegación de servicio (DDoS)",
+      "terminos": ["ddos", "denegacion de servicio", "denial of service", "sitio caido", "sitios caidos", "caida del sitio", "fuera de servicio", "inaccesible", "flood"],
+      "tecnicas": ["T1498", "T1499"]
+    },
+    {
+      "categoria": "Filtración / robo de datos",
+      "terminos": ["filtracion de datos", "filtraron datos", "datos filtrados", "base de datos filtrada", "data leak", "data breach", "leaked data", "exfiltracion", "exfiltration", "exfiltrated", "robaron datos", "dump"],
+      "tecnicas": ["T1213", "T1567"]
+    },
+    {
+      "categoria": "Explotación de aplicación expuesta",
+      "terminos": ["vulnerabilidad", "vulnerability", "exploit", "inyeccion sql", "sql injection", "cve-"],
+      "tecnicas": ["T1190"]
+    },
+    {
+      "categoria": "Uso de credenciales robadas",
+      "terminos": ["credenciales", "contrasenas", "credentials", "passwords", "cuentas comprometidas"],
+      "tecnicas": ["T1078"]
+    },
+    {
+      "categoria": "Ransomware",
+      "terminos": ["ransomware", "cifraron", "rescate"],
+      "tecnicas": ["T1486"]
+    },
+    {
+      "categoria": "Phishing",
+      "terminos": ["phishing", "correo fraudulento", "suplantacion"],
+      "tecnicas": ["T1566"]
+    }
+  ]
+}
