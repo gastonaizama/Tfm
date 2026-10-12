@@ -8,6 +8,11 @@ on:
     branches: ["claude/**"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      diagnostico:
+        description: "Solo probar variantes de consulta a GDELT"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -32,7 +37,11 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Pruebas de las reglas
         run: python -m unittest -v
-      - name: Histórico de GDELT (dos semanas, como prueba)
+      - name: Diagnóstico de GDELT
+        if: github.event.inputs.diagnostico == 'true'
+        run: python -m monitor diagnostico
+      - name: Histórico de GDELT (una semana, como prueba)
+        if: github.event.inputs.diagnostico != 'true'
         env:
           MONITOR_HIST_INICIO: "2024-02-01"
           MONITOR_HIST_FIN: "2024-02-07"
