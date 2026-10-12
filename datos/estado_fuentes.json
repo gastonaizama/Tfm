@@ -1,0 +1,67 @@
+{
+ "fecha": "2026-10-12T22:37:54+00:00",
+ "fuentes": [
+  {
+   "nombre": "The Record",
+   "url": "https://therecord.media/feed",
+   "ok": true,
+   "items": 5,
+   "detalle": "",
+   "http": 200
+  },
+  {
+   "nombre": "BleepingComputer",
+   "url": "https://www.bleepingcomputer.com/feed/",
+   "ok": true,
+   "items": 15,
+   "detalle": "",
+   "http": 200
+  },
+  {
+   "nombre": "The Hacker News",
+   "url": "https://feeds.feedburner.com/TheHackersNews",
+   "ok": true,
+   "items": 50,
+   "detalle": "",
+   "http": 200
+  },
+  {
+   "nombre": "WeLiveSecurity (ESET)",
+   "url": "https://www.welivesecurity.com/es/rss/feed/",
+   "ok": true,
+   "items": 100,
+   "detalle": "",
+   "http": 200
+  },
+  {
+   "nombre": "Infobae",
+   "url": "https://www.infobae.com/arc/outboundfeeds/rss/",
+   "ok": true,
+   "items": 100,
+   "detalle": "",
+   "http": 200
+  },
+  {
+   "nombre": "La Nación",
+   "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml",
+   "ok": true,
+   "items": 89,
+   "detalle": "",
+   "http": 200
+  },
+  {
+   "nombre": "GDELT DOC API",
+   "url": "(Argentina OR argentino OR Argentine OR Milei) (Israel OR Hamas OR Iran OR AMIA OR embajada OR embassy OR Palestina OR Palestinian OR Hezbollah)",
+   "ok": false,
+   "items": 0,
+   "detalle": "LimiteGdelt: GDELT: límite de consultas (HTTP 429)"
+  },
+  {
+   "nombre": "GDELT DOC API",
+   "url": "(Argentina OR argentino OR Argentine OR \"gob.ar\") (hackeo OR hackers OR ciberataque OR hacktivistas OR hacktivists OR cyberattack OR DDoS OR defacement OR \"filtración de datos\" OR \"data leak\")",
+   "ok": false,
+   "items": 0,
+   "detalle": "LimiteGdelt: GDELT: límite de consultas (HTTP 429)"
+  }
+ ]
+}
