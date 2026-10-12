@@ -1,0 +1,60 @@
+# Descarga por partes el histórico de GDELT (agosto 2023 – julio 2024).
+# GDELT limita la cantidad de consultas, así que cada hora se avanza hasta 40 minutos
+# y se guarda el progreso. Cuando el histórico está completo, la tarea termina al instante.
+name: Completar histórico
+
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monitor          # el mismo grupo que "Actualizar monitor": nunca corren a la vez
+  cancel-in-progress: false
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  historico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: ¿Falta descargar algo?
+        id: estado
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          ruta = "datos/gdelt_historico.json"
+          completo = os.path.exists(ruta) and json.load(open(ruta)).get("completo", False)
+          print("completo=" + ("true" if completo else "false"))
+          PY
+
+      - if: steps.estado.outputs.completo != 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Descargar el siguiente tramo y recalcular
+        if: steps.estado.outputs.completo != 'true'
+        run: |
+          pip install -r requirements.txt
+          python -m monitor historico
+          python -m monitor recalcular
+
+      - name: Guardar el progreso
+        if: steps.estado.outputs.completo != 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add datos/ web/datos.json
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -m "Histórico GDELT: avance $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

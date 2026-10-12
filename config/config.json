@@ -69,23 +69,25 @@
 
   "gdelt": {
     "url": "https://api.gdeltproject.org/api/v2/doc/doc",
+    "_nota_consultas": "Cada consulta mezcla español e inglés para hacer menos pedidos a GDELT (tiene límite de uso).",
     "consultas_geopoliticas": [
-      "(Argentina OR argentino OR Milei) (Israel OR Hamas OR Iran OR AMIA OR embajada OR Palestina)",
-      "(Argentina OR Argentine OR Milei) (Israel OR Hamas OR Iran OR AMIA OR embassy OR Palestinian)"
+      "(Argentina OR argentino OR Argentine OR Milei) (Israel OR Hamas OR Iran OR AMIA OR embajada OR embassy OR Palestina OR Palestinian OR Hezbollah)"
     ],
     "consultas_ciber": [
-      "(Argentina OR argentino OR \"gob.ar\") (hackeo OR hackers OR ciberataque OR hacktivistas OR filtración)",
-      "(Argentina OR Argentine) (hacktivists OR cyberattack OR DDoS OR defacement OR \"data leak\")"
+      "(Argentina OR argentino OR Argentine OR \"gob.ar\") (hackeo OR hackers OR ciberataque OR hacktivistas OR hacktivists OR cyberattack OR DDoS OR defacement OR \"filtración de datos\" OR \"data leak\")"
     ],
-    "ventana_consulta_vivo": "3d",
+    "ventana_consulta_vivo": "1d",
     "max_resultados": 250,
-    "pausa_entre_consultas_seg": 6
+    "pausa_entre_consultas_seg": 6,
+    "espera_tras_limite_seg": 20
   },
 
   "historico": {
     "inicio": "2023-08-01",
     "fin": "2024-07-31",
-    "dias_por_tramo": 3
+    "_nota": "El histórico de GDELT se descarga por partes (workflow 'Completar histórico', cada hora) hasta completarse.",
+    "dias_por_tramo": {"geo": 2, "ciber": 30},
+    "presupuesto_minutos": 40
   },
 
   "almacenamiento": {

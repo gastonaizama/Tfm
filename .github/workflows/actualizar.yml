@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: "actualizar = revisión normal · historico = volver a descargar GDELT 2023-2024 · recalcular = sin descargar"
+        description: "actualizar = revisión normal · historico = borrar y volver a empezar la descarga de GDELT 2023-2024 · recalcular = sin descargar"
         type: choice
         options: [actualizar, historico, recalcular]
         default: actualizar
@@ -55,13 +55,11 @@ jobs:
           if [ -z "$MODO" ]; then
             if [ "${{ github.event_name }}" = "push" ]; then MODO=recalcular; else MODO=actualizar; fi
           fi
-          # La primera vez se descarga automáticamente el histórico de GDELT (tarda ~1 hora).
-          if [ ! -f datos/gdelt_historico.json ] || [ "$MODO" = "historico" ]; then
-            python -m monitor historico
-          fi
-          if [ "$MODO" != "historico" ]; then
-            python -m monitor "$MODO"
-          fi
+          case "$MODO" in
+            historico)  python -m monitor historico --reiniciar && python -m monitor recalcular ;;
+            actualizar) python -m monitor actualizar ;;
+            *)          python -m monitor recalcular ;;
+          esac
 
       - name: Guardar los datos en el repositorio
         run: |

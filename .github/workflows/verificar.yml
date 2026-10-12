@@ -32,11 +32,11 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Pruebas de las reglas
         run: python -m unittest -v
-      - name: Histórico de GDELT (solo un mes, como prueba)
-        if: hashFiles('datos/gdelt_historico.json') == ''
+      - name: Histórico de GDELT (dos semanas, como prueba)
         env:
           MONITOR_HIST_INICIO: "2024-02-01"
-          MONITOR_HIST_FIN: "2024-02-29"
+          MONITOR_HIST_FIN: "2024-02-07"
+          MONITOR_HIST_MINUTOS: "8"
         run: python -m monitor historico
       - name: Revisión en vivo
         run: python -m monitor actualizar

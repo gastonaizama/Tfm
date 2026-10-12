@@ -48,15 +48,22 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
 - **Combinación de fuentes:** los medios especializados en ciberseguridad (en inglés) detectan campañas reportadas internacionalmente. Los medios argentinos (en español) detectan hechos geopolíticos locales y ataques a organismos nacionales que no llegan a la prensa internacional.
 
 ### D8. GDELT DOC 2.0 API como fuente geopolítica con historial
-- **Prueba realizada:** la API devuelve artículos de 2023–2024 consultando por rango de fechas (`startdatetime`/`enddatetime`). Por ejemplo, se obtuvieron 250 artículos para el 1–15 de febrero de 2024. El modo `TimelineVolRaw` devuelve el volumen diario de todo el periodo.
-- **Limitación detectada:** GDELT permite una consulta cada 5 segundos por IP. Los servidores de GitHub son compartidos, así que se reciben errores HTTP 429 aun respetando ese ritmo.
-- **Decisión:** se espera 6 segundos entre consultas y se reintenta con espera creciente (15, 30, 45… segundos) ante un 429. Si una consulta falla, no se detiene la revisión: el error queda registrado en el diagnóstico de fuentes.
-- **Consultas:** dos geopolíticas (en español e inglés) y dos cibernéticas (en español e inglés), definidas en `config.json`.
+- **Prueba realizada:** la API devuelve artículos de 2023–2024 consultando por rango de fechas (`startdatetime`/`enddatetime`). Por ejemplo, se obtuvieron 250 artículos para el 1–15 de febrero de 2024. El modo `TimelineVolRaw` devuelve el volumen diario de todo el periodo en una sola consulta.
+- **Limitación detectada (medida en la verificación del 12/10/2026):** GDELT admite una consulta cada 5 segundos por IP, pero los servidores de GitHub son compartidos y se reciben muchos HTTP 429. En la práctica salió **una consulta exitosa cada 20 segundos a 3,5 minutos**. Un mes de histórico con tramos de 3 días y 4 consultas superó los 30 minutos sin terminar.
+- **Decisión:**
+  - Unir las consultas en español e inglés en **una consulta geopolítica** y **una consulta ciber**, para hacer la mitad de pedidos.
+  - Ante un 429, reintentar con espera creciente (20, 40 s). Si una consulta falla, la revisión continúa y el error queda en el diagnóstico de fuentes.
+  - Pedir los artículos **ordenados por relevancia** (`sort=HybridRel`). Como la API corta en 250, conviene que esos 250 sean los más pertinentes y no simplemente los más recientes.
 
-### D9. El histórico de GDELT se descarga una sola vez
-- **Decisión:** `python -m monitor historico` descarga agosto 2023 – julio 2024 en **tramos de 3 días** y lo guarda en `datos/gdelt_historico.json`. El *workflow* lo hace automáticamente si el archivo no existe.
-- **Motivo:** son unas 500 consultas (alrededor de 1 hora). Repetirlas cada 6 horas sería innecesario y abusivo con un servicio gratuito.
-- **Tramos cortos:** cada consulta devuelve como máximo 250 artículos. Los tramos que llegan al máximo se marcan como `saturado: true` para que se sepa dónde puede faltar cobertura.
+### D9. El histórico de GDELT se descarga por partes y de forma reanudable
+- **Medición:** las consultas geopolíticas llegan al tope de 250 artículos incluso en tramos de 3 días alrededor de hechos clave (febrero de 2024). Las consultas ciber traen entre 0 y 4 artículos por tramo.
+- **Decisión:**
+  - **Tramos distintos por tipo:** 2 días para la geopolítica y 30 días para la ciber. Son 196 consultas para el año del caso de estudio.
+  - **Descarga reanudable:** `datos/gdelt_historico.json` registra los tramos ya descargados. Cada ejecución continúa donde quedó la anterior, con un **presupuesto de 40 minutos**, y se detiene antes si GDELT rechaza 3 consultas seguidas.
+  - **Workflow propio** (`historico.yml`) cada hora. Cuando el histórico está completo, termina en segundos sin hacer consultas.
+- **Motivo:** cumplir con los límites de un servicio gratuito, no perder progreso si una ejecución se corta y no bloquear la revisión en vivo, que sigue en su propio *workflow* cada 6 horas.
+- **Descartado:** descargar todo en una sola ejecución (no termina dentro de los límites de tiempo) y usar los archivos crudos de eventos de GDELT 1.0/2.0 (gigabytes de descarga, sin titulares).
+- **Transparencia:** los tramos que llegan al tope se marcan `saturado: true`, y la web informa si el histórico está completo.
 
 ### D10. Archivo propio de noticias en vivo
 - **Contexto:** los feeds RSS solo muestran las últimas 5–100 noticias; lo anterior desaparece.
@@ -129,8 +136,9 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
 - **Decisión:** `cron: "17 */6 * * *"`.
 - **Motivo:** GitHub recomienda evitar el minuto 0, porque concentra la carga y produce retrasos.
 
-### D22. Workflows separados para producción y verificación
-- `actualizar.yml` (rama `main`): se ejecuta por programación, manualmente o al cambiar la configuración. Guarda los datos y publica la web.
+### D22. Workflows separados para producción, histórico y verificación
+- `actualizar.yml` (rama principal): se ejecuta por programación, manualmente o al cambiar la configuración. Guarda los datos y publica la web.
+- `historico.yml`: cada hora, hasta completar el histórico de GDELT (ver D9). Comparte con `actualizar.yml` un grupo de concurrencia, así que nunca escriben datos a la vez.
 - `verificar.yml` (ramas de desarrollo y *pull requests*): ejecuta los tests y una revisión real contra las fuentes **sin guardar nada**. Deja la web resultante como *artifact* descargable.
 - **Motivo:** probar los cambios con datos reales antes de que afecten a la plataforma publicada.
 

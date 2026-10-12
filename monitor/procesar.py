@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 from . import historico, mitre, semaforo
 from .clasificador import Clasificador
-from .config import (ARCHIVO_ESTADO_FUENTES, ARCHIVO_NOTICIAS, ARCHIVO_SALIDA_WEB, cargar_config,
+from .config import (ARCHIVO_ESTADO_FUENTES, ARCHIVO_GDELT_HIST, ARCHIVO_NOTICIAS, ARCHIVO_SALIDA_WEB, cargar_config,
                      cargar_mapeo_mitre, guardar_json, leer_json)
 from .fuentes import gdelt, rss
 from .ia import integracion as ia
@@ -31,7 +31,7 @@ def recolectar(config: dict) -> tuple[list[dict], list[dict]]:
     for q in cfg["consultas_geopoliticas"] + cfg["consultas_ciber"]:
         diag = {"nombre": "GDELT DOC API", "url": q, "ok": False, "items": 0, "detalle": ""}
         try:
-            items = gdelt.consultar(cfg, q, timespan=cfg["ventana_consulta_vivo"])
+            items = gdelt.consultar(cfg, q, timespan=cfg["ventana_consulta_vivo"], reintentos=2)
             diag.update(ok=True, items=len(items))
             noticias.extend(items)
         except Exception as e:
@@ -93,6 +93,14 @@ def construir_eventos(noticias: list[dict], clasificador: Clasificador) -> list[
     return eventos
 
 
+def _estado_historico() -> dict:
+    h = leer_json(ARCHIVO_GDELT_HIST, {})
+    tramos = h.get("tramos", [])
+    return {"completo": bool(h.get("completo")), "tramos_descargados": len(tramos),
+            "tramos_saturados": sum(1 for t in tramos if t.get("saturado")),
+            "articulos": len(h.get("noticias", [])), "actualizado": h.get("actualizado")}
+
+
 def ejecutar(recolectar_en_vivo: bool = True) -> dict:
     config = cargar_config()
     mapeo = cargar_mapeo_mitre()
@@ -127,6 +135,7 @@ def ejecutar(recolectar_en_vivo: bool = True) -> dict:
         "eventos": eventos,
         "mitre": catalogo,
         "fuentes": leer_json(ARCHIVO_ESTADO_FUENTES, {}),
+        "historico_gdelt": _estado_historico(),
         "informe_ia": informe,
     }
     guardar_json(ARCHIVO_SALIDA_WEB, salida, compacto=True)

@@ -67,12 +67,15 @@ function marcarModo(m) {
 }
 function modoVivo() {
   marcarModo("vivo");
+  $("aviso-hist").hidden = true;
   estado.hasta = hoyISO();
   estado.desde = sumarDias(estado.hasta, -(estado.datos.parametros.dias_modo_vivo || 30));
   render();
 }
 function modoHistorico() {
   marcarModo("historico");
+  const h = estado.datos.historico_gdelt || {};
+  $("aviso-hist").hidden = !!h.completo;
   estado.desde = estado.datos.parametros.historico.inicio;
   estado.hasta = estado.datos.parametros.historico.fin;
   render();
@@ -306,12 +309,15 @@ function renderFuentes() {
 }
 function renderMetodologia() {
   const p = estado.datos.parametros;
+  const h = estado.datos.historico_gdelt || {};
   $("metodologia").innerHTML = `<p><b>Cómo se calcula el semáforo.</b> Una noticia es <i>geopolítica relevante</i> si menciona a Argentina
   y sus términos geopolíticos suman al menos ${p.umbral_puntaje_detonante} puntos. Un día es <i>detonante</i> cuando esas noticias aparecen en
   al menos ${p.min_fuentes_distintas_por_dia} fuentes distintas, o cuando hay un hecho clave cargado a mano. Cada detonante abre una
   <i>ventana de vigilancia</i> de ${p.ventana_vigilancia_dias} días (amarillo). Si dentro de la ventana aparece una noticia de ataque
   contra objetivos argentinos, el nivel pasa a rojo hasta que la ventana se cierre. Los ataques fuera de toda ventana se listan como
   alertas informativas para evaluar el modelo.</p>
+  <p><b>Histórico de GDELT:</b> ${h.completo ? "completo" : "descarga en curso (avanza por partes en cada revisión)"} ·
+  ${h.articulos || 0} artículos · ${h.tramos_descargados || 0} tramos descargados${h.tramos_saturados ? ` (${h.tramos_saturados} saturados: pueden faltar artículos)` : ""}.</p>
   <p>Clasificación por reglas de palabras clave (Fase 1). IA: ${p.ia_activada ? "activada" : "no activada (Fase 2 pendiente)"}.</p>`;
 }
 function renderInforme() {

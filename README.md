@@ -80,7 +80,7 @@ Todos los números se pueden cambiar en [`config/config.json`](config/config.jso
 | [WeLiveSecurity – ESET](https://www.welivesecurity.com/es/rss/feed/) | Ciberseguridad (ES) | ✅ (la dirección `/es/feed/` da error 404) |
 | [Infobae](https://www.infobae.com/arc/outboundfeeds/rss/) | Medio argentino | ✅ |
 | [La Nación](https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml) | Medio argentino | ✅ |
-| [GDELT DOC 2.0 API](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) | Noticias mundiales, con historial | ✅ (con límite de una consulta cada 5 segundos) |
+| [GDELT DOC 2.0 API](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) | Noticias mundiales, con historial | ✅ (con límite de uso estricto; ver limitaciones) |
 | [MITRE ATT&CK](https://github.com/mitre/cti) | Catálogo de técnicas | ✅ |
 
 La página muestra en cada revisión el estado de cada fuente, en la sección "Estado de las fuentes y metodología".
@@ -97,7 +97,7 @@ Tfm/
 ├── datos/
 │   ├── incidentes_historicos.csv  ← ATAQUES conocidos (carga manual)
 │   ├── hechos_clave.csv           ← HECHOS geopolíticos de referencia (carga manual)
-│   ├── gdelt_historico.json       ← noticias GDELT ago-2023 → jul-2024 (se genera solo)
+│   ├── gdelt_historico.json       ← noticias GDELT ago-2023 → jul-2024 (se completa solo, por partes)
 │   ├── noticias_vivo.json         ← archivo propio de noticias relevantes vistas en vivo
 │   ├── mitre_tecnicas.json        ← nombres oficiales de las técnicas usadas
 │   └── estado_fuentes.json        ← diagnóstico de la última revisión
@@ -115,6 +115,7 @@ Tfm/
 ├── docs/decisiones_tecnicas.md← decisiones de diseño (para la memoria del TFM)
 └── .github/workflows/
     ├── actualizar.yml         ← cada 6 h: recolecta, calcula, guarda y publica
+    ├── historico.yml          ← cada hora, hasta completarlo: descarga el histórico de GDELT
     └── verificar.yml          ← prueba los cambios antes de unirlos a main
 ```
 
@@ -124,7 +125,7 @@ Tfm/
 
 Los feeds RSS solo muestran las últimas noticias, así que el periodo **agosto 2023 – julio 2024** se arma con tres fuentes:
 
-1. **GDELT**: se descarga una sola vez, de forma automática, en la primera ejecución. Se guarda en `datos/gdelt_historico.json`.
+1. **GDELT**: se descarga automáticamente **por partes**. La tarea *Completar histórico* corre cada hora, avanza lo que GDELT permite y guarda el progreso en `datos/gdelt_historico.json`. En total son unas 200 consultas; según cuánto limite GDELT, el histórico tarda entre unas horas y un par de días en completarse. Mientras tanto, la página muestra un aviso.
 2. **`datos/hechos_clave.csv`**: hechos geopolíticos de referencia (7 de octubre de 2023, anuncio del traslado de la embajada, fallo AMIA, etc.). Cada uno abre una ventana por sí solo. ⚠️ Están marcados como `verificado = no`: revisá las fechas y completá la columna `fuente_url`.
 3. **`datos/incidentes_historicos.csv`**: los ataques conocidos que documentes en tu investigación.
 
@@ -157,7 +158,7 @@ Los feeds RSS solo muestran las últimas noticias, así que el periodo **agosto 
 1. **Copiá el repositorio**: en GitHub pulsá **Fork**, o creá un repositorio nuevo y subí estos archivos.
 2. **Activá GitHub Pages**: *Settings → Pages → Build and deployment → Source:* **GitHub Actions**.
 3. **Dale permiso de escritura a Actions**: *Settings → Actions → General → Workflow permissions:* **Read and write permissions** → *Save*.
-4. **Hacé la primera ejecución**: pestaña *Actions → Actualizar monitor → Run workflow*. La primera vez tarda alrededor de **1 hora**, porque descarga el histórico de GDELT. Después tarda unos 2 minutos.
+4. **Hacé la primera ejecución**: pestaña *Actions → Actualizar monitor → Run workflow*. Tarda unos 2–5 minutos. El histórico de GDELT se completa solo en segundo plano (*Actions → Completar histórico*, cada hora).
 5. Abrí `https://<tu-usuario>.github.io/<repositorio>/`.
 
 A partir de ahí la revisión corre sola cada 6 horas (00:17, 06:17, 12:17 y 18:17 UTC).
@@ -165,7 +166,7 @@ A partir de ahí la revisión corre sola cada 6 horas (00:17, 06:17, 12:17 y 18:
 **Opciones del botón *Run workflow*:**
 - `actualizar`: revisión normal.
 - `recalcular`: recalcula el semáforo sin descargar noticias. Sirve después de cambiar `config.json`.
-- `historico`: vuelve a descargar el histórico de GDELT.
+- `historico`: borra el histórico de GDELT y vuelve a empezar la descarga, que sigue por partes.
 
 ### Probarlo en una computadora (opcional)
 ```bash
@@ -193,7 +194,8 @@ Para activarla cuando esté implementada:
 
 - **Palabras clave**: hay falsos positivos (noticias que mencionan los términos sin relación real) y falsos negativos (ataques descritos con otras palabras). La Fase 2 busca reducir ambos.
 - Solo se analizan el **título y el resumen** de cada noticia, no el texto completo.
-- La DOC API de GDELT devuelve como máximo 250 artículos por consulta. Los tramos que llegan a ese máximo quedan marcados como "saturados" en `gdelt_historico.json`.
+- La DOC API de GDELT devuelve como máximo 250 artículos por consulta. Se piden ordenados por relevancia, y los tramos que llegan a ese máximo quedan marcados como "saturados" en `gdelt_historico.json`. En los días de mucha cobertura (por ejemplo, la visita a Israel en febrero de 2024) puede faltar parte de los artículos.
+- GDELT limita la frecuencia de consultas y los servidores de GitHub son compartidos, así que muchas consultas se rechazan y se reintentan más tarde.
 - Los grupos hacktivistas suelen anunciar sus ataques en Telegram o X, fuentes que esta fase no monitorea. Por eso existe la carga manual de incidentes.
 - El semáforo indica **correlación temporal**, no atribución.
 

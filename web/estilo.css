@@ -69,6 +69,8 @@ button { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid v
 .tarjeta-titulo { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 10px; }
 details > summary { cursor: pointer; }
 
+.aviso { background: var(--banda-a); border: 1px solid var(--aviso); border-radius: 10px; padding: 8px 12px; margin: 0 0 16px; font-size: .9rem; }
+
 /* Semáforo */
 .semaforo-tarjeta { display: grid; grid-template-columns: auto 1fr auto; gap: 20px; align-items: center; }
 .semaforo { display: flex; flex-direction: column; gap: 8px; background: #1f1f1d; padding: 10px; border-radius: 16px; }
