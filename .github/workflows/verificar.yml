@@ -12,6 +12,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: verificar-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHONUNBUFFERED: "1"   # que los mensajes aparezcan en el registro en tiempo real
+
 jobs:
   verificar:
     runs-on: ubuntu-latest

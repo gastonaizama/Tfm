@@ -25,6 +25,7 @@ const fechaLarga = (s) => { const d = aFecha(s); return `${d.getUTCDate()} ${MES
 const hoyISO = () => aISO(new Date());
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const enlace = (url, txt) => url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(txt)}</a>` : esc(txt);
+const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 const esCurado = (e) => e.origen === "hecho_clave" || e.origen === "incidente_csv";
 
 // ---------- carga ----------
@@ -51,6 +52,7 @@ async function iniciar() {
     marcarModo(estado.hasta >= sumarDias(hoyISO(), -1) ? "vivo" : "historico");
     render();
   };
+  $("ver-info").onchange = renderAlertas;
   let t; window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(dibujarLinea, 150); });
   renderFuentes(); renderMetodologia(); renderInforme();
   modoVivo();
@@ -260,10 +262,12 @@ function renderAlertas() {
   const d = estado.datos;
   const alertas = d.alertas.filter((a) => {
     if (a.nivel === "amarillo") { const p = d.periodos.find((x) => x.id === a.periodo); return p && p.inicio <= estado.hasta && p.fin >= estado.desde; }
+    if (a.nivel === "info" && !$("ver-info").checked) return false;
     return a.fecha >= estado.desde && a.fecha <= estado.hasta;
   });
   const n = (nv) => alertas.filter((a) => a.nivel === nv).length;
-  $("contador-alertas").textContent = `${n("rojo")} rojas · ${n("amarillo")} amarillas · ${n("info")} informativas`;
+  $("contador-alertas").textContent = `${plural(n("rojo"), "roja", "rojas")} · ${plural(n("amarillo"), "amarilla", "amarillas")}` +
+    ($("ver-info").checked ? ` · ${plural(n("info"), "informativa", "informativas")}` : "");
   if (!alertas.length) { $("alertas").innerHTML = `<li class="vacio" style="border:0">No hay alertas en el periodo seleccionado.</li>`; return; }
   $("alertas").innerHTML = alertas.map((a) => {
     const evs = (a.eventos || []).map((id) => d.porId[id]).filter(Boolean);
@@ -274,7 +278,7 @@ function renderAlertas() {
       <span class="fecha">${fechaLarga(a.fecha)}${a.hasta ? " → " + fechaLarga(a.hasta) : ""}</span></div>
       <div>${esc(a.titulo)}</div>
       ${tecnicas.length ? `<div>${chipsMitre(tecnicas)}</div>` : ""}
-      <details><summary>${evs.length} ${a.nivel === "amarillo" ? "noticias detonantes" : "ataques"}${det.length ? ` · ${det.length} detonantes relacionados` : ""}</summary>
+      <details><summary>${a.nivel === "amarillo" ? plural(evs.length, "noticia detonante", "noticias detonantes") : plural(evs.length, "ataque", "ataques")}${det.length ? ` · ${plural(det.length, "detonante relacionado", "detonantes relacionados")}` : ""}</summary>
         <ul>${evs.slice(0, 30).map(itemEvento).join("")}</ul>
         ${det.length ? `<p style="margin:4px 0 0"><b>Contexto geopolítico (detonantes)</b></p><ul>${det.slice(0, 10).map(itemEvento).join("")}</ul>` : ""}
       </details></li>`;

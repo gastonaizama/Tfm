@@ -25,6 +25,9 @@ concurrency:
   group: monitor
   cancel-in-progress: false
 
+env:
+  PYTHONUNBUFFERED: "1"   # que los mensajes aparezcan en el registro en tiempo real
+
 jobs:
   actualizar:
     runs-on: ubuntu-latest

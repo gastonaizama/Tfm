@@ -104,7 +104,8 @@ details > summary { cursor: pointer; }
 .detalle-dia ul { margin: 6px 0 0; padding-left: 18px; }
 
 /* Alertas */
-.contador { color: var(--texto-2); font-size: .9rem; }
+.contador { color: var(--texto-2); font-size: .9rem; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.interruptor { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
 .alertas { list-style: none; margin: 0; padding: 0; }
 .alertas > li { border: 1px solid var(--borde); border-left-width: 5px; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
 .alertas > li.rojo { border-left-color: var(--critico); }
