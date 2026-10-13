@@ -113,6 +113,7 @@ Tfm/
 │   └── datos.json                 ← resultado que lee la página (se genera solo)
 ├── tests/test_reglas.py       ← pruebas automáticas de las reglas
 ├── docs/decisiones_tecnicas.md← decisiones de diseño (para la memoria del TFM)
+├── memoria/Memoria_TFM.docx   ← memoria de trabajo en Word (se actualiza con cada avance)
 └── .github/workflows/
     ├── actualizar.yml         ← cada 6 h: recolecta, calcula, guarda y publica
     ├── historico.yml          ← cada hora, hasta completarlo: descarga el histórico de GDELT
