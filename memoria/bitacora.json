@@ -1,40 +1,119 @@
 {
   "_ayuda": "Registro cronológico del proyecto. En cada avance se agrega una entrada en 'eventos' (y, si corresponde, una versión nueva en 'versiones') y se regenera la memoria con: node memoria/generar_memoria.js",
   "versiones": [
-    {"version": "0.1", "fecha": "13/10/2026", "cambios": "Versión inicial: documenta la Fase 1 completa (planificación, desarrollo, puesta en marcha y primeras mediciones)."}
+    {
+      "version": "0.1",
+      "fecha": "13/10/2026",
+      "cambios": "Versión inicial: documenta la Fase 1 completa (planificación, desarrollo, puesta en marcha y primeras mediciones)."
+    },
+    {
+      "version": "0.2",
+      "fecha": "13/10/2026",
+      "cambios": "Búsqueda inicial de incidentes del caso de estudio (sección 5.4) con candidatos pendientes de validación por el autor."
+    }
   ],
   "eventos": [
-    {"fecha": "12/10/2026", "tipo": "Planificación", "titulo": "Definición de requisitos y plan de trabajo",
-     "detalle": "El autor planteó la plataforma (fuentes, palabras clave, semáforo, pantalla única, modo histórico, Fase 2 con IA, documentación en español). Se propuso un plan de 9 pasos y el autor lo aprobó antes de empezar."},
-    {"fecha": "12/10/2026", "tipo": "Problema", "titulo": "El entorno de desarrollo no puede acceder a los feeds",
-     "detalle": "El entorno en la nube donde se escribe el código tiene la salida a internet restringida (HTTP 403 del proxy). Se decidió probar las fuentes desde los servidores de GitHub Actions, que es donde la plataforma funciona realmente."},
-    {"fecha": "12/10/2026", "tipo": "Problema", "titulo": "Error 403 al subir el código al repositorio",
-     "detalle": "La aplicación de Claude no tenía permiso sobre el repositorio gastonaizama/Tfm. El autor instaló/reconectó la Claude GitHub App y el envío funcionó."},
-    {"fecha": "12/10/2026", "tipo": "Prueba", "titulo": "Prueba de disponibilidad de fuentes en GitHub Actions",
-     "detalle": "Los 6 feeds RSS respondieron (WeLiveSecurity con la URL /es/rss/feed/). GDELT devolvió artículos de 2023-2024 por rango de fechas (histórico viable), pero con frecuentes rechazos HTTP 429 por límite de uso."},
-    {"fecha": "12/10/2026", "tipo": "Desarrollo", "titulo": "Primera versión completa de la plataforma",
-     "detalle": "Motor en Python (conectores RSS y GDELT, clasificador por palabras clave, mapeo MITRE ATT&CK, semáforo con ventana configurable, modo histórico), página web de una sola pantalla, workflows de GitHub Actions, 13 pruebas automáticas, README y documento de decisiones técnicas."},
-    {"fecha": "12/10/2026", "tipo": "Problema", "titulo": "Las verificaciones se cortaban a los 30 minutos",
-     "detalle": "Un mes de histórico de GDELT no terminó en 30 minutos. Medición: una consulta útil cada 20 s a 3,5 min; las consultas geopolíticas llegaban al tope de 250 artículos incluso en tramos de 3 días."},
-    {"fecha": "12/10/2026", "tipo": "Desarrollo", "titulo": "Rediseño: histórico de GDELT por partes y reanudable",
-     "detalle": "Consultas español/inglés unificadas, orden por relevancia, tramos de 2 días (geo) y 30 días (ciber), progreso guardado, presupuesto de 40 minutos por ejecución y nuevo workflow 'Completar histórico' cada hora."},
-    {"fecha": "12/10/2026", "tipo": "Prueba", "titulo": "Verificación completa exitosa",
-     "detalle": "Pruebas, histórico (detención controlada ante rechazos) y revisión en vivo correctas. El clasificador detectó un ataque real: 'Un hackeo mundial: el ciberataque a la Asociación del Fútbol Argentino' (WeLiveSecurity)."},
-    {"fecha": "12/10/2026", "tipo": "Prueba", "titulo": "Diagnóstico de consultas a GDELT",
-     "detalle": "3 de 5 consultas de prueba rechazadas (HTTP 429). Conclusión: en vivo los RSS son la fuente principal y GDELT es complementario; GDELT es más valioso para el análisis histórico (decisión D8b)."},
-    {"fecha": "12/10/2026", "tipo": "Configuración", "titulo": "Configuración de GitHub por el autor",
-     "detalle": "GitHub Pages con origen 'GitHub Actions' y permisos de lectura y escritura para los workflows."},
-    {"fecha": "12/10/2026", "tipo": "Configuración", "titulo": "Creación de la rama main",
-     "detalle": "Con autorización del autor se creó la rama main y el autor la marcó como rama principal del repositorio."},
-    {"fecha": "12/10/2026", "tipo": "Problema", "titulo": "La primera publicación de la web fue rechazada",
-     "detalle": "El entorno github-pages solo permitía publicar desde la rama de desarrollo (era la principal cuando se activó Pages). El autor agregó main a las reglas del entorno y la publicación funcionó."},
-    {"fecha": "12/10/2026", "tipo": "Hito", "titulo": "Plataforma publicada",
-     "detalle": "Primera revisión oficial desde main y publicación en https://gastonaizama.github.io/Tfm/."},
-    {"fecha": "12/10/2026", "tipo": "Configuración", "titulo": "Pull Request #1 fusionado",
-     "detalle": "Se incorporó a main la decisión técnica D8b. El autor revisó y fusionó el Pull Request desde la web de GitHub."},
-    {"fecha": "12/10/2026", "tipo": "Configuración", "titulo": "Inicio de la descarga del histórico",
-     "detalle": "Se lanzó manualmente el workflow 'Completar histórico' para no esperar a que GitHub active la programación horaria."},
-    {"fecha": "13/10/2026", "tipo": "Documentación", "titulo": "Creación de esta memoria",
-     "detalle": "Documento Word generado automáticamente desde el repositorio (memoria/generar_memoria.js), con capturas de pantalla, que se actualiza con cada avance del proyecto."}
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Planificación",
+      "titulo": "Definición de requisitos y plan de trabajo",
+      "detalle": "El autor planteó la plataforma (fuentes, palabras clave, semáforo, pantalla única, modo histórico, Fase 2 con IA, documentación en español). Se propuso un plan de 9 pasos y el autor lo aprobó antes de empezar."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Problema",
+      "titulo": "El entorno de desarrollo no puede acceder a los feeds",
+      "detalle": "El entorno en la nube donde se escribe el código tiene la salida a internet restringida (HTTP 403 del proxy). Se decidió probar las fuentes desde los servidores de GitHub Actions, que es donde la plataforma funciona realmente."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Problema",
+      "titulo": "Error 403 al subir el código al repositorio",
+      "detalle": "La aplicación de Claude no tenía permiso sobre el repositorio gastonaizama/Tfm. El autor instaló/reconectó la Claude GitHub App y el envío funcionó."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Prueba",
+      "titulo": "Prueba de disponibilidad de fuentes en GitHub Actions",
+      "detalle": "Los 6 feeds RSS respondieron (WeLiveSecurity con la URL /es/rss/feed/). GDELT devolvió artículos de 2023-2024 por rango de fechas (histórico viable), pero con frecuentes rechazos HTTP 429 por límite de uso."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Desarrollo",
+      "titulo": "Primera versión completa de la plataforma",
+      "detalle": "Motor en Python (conectores RSS y GDELT, clasificador por palabras clave, mapeo MITRE ATT&CK, semáforo con ventana configurable, modo histórico), página web de una sola pantalla, workflows de GitHub Actions, 13 pruebas automáticas, README y documento de decisiones técnicas."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Problema",
+      "titulo": "Las verificaciones se cortaban a los 30 minutos",
+      "detalle": "Un mes de histórico de GDELT no terminó en 30 minutos. Medición: una consulta útil cada 20 s a 3,5 min; las consultas geopolíticas llegaban al tope de 250 artículos incluso en tramos de 3 días."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Desarrollo",
+      "titulo": "Rediseño: histórico de GDELT por partes y reanudable",
+      "detalle": "Consultas español/inglés unificadas, orden por relevancia, tramos de 2 días (geo) y 30 días (ciber), progreso guardado, presupuesto de 40 minutos por ejecución y nuevo workflow 'Completar histórico' cada hora."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Prueba",
+      "titulo": "Verificación completa exitosa",
+      "detalle": "Pruebas, histórico (detención controlada ante rechazos) y revisión en vivo correctas. El clasificador detectó un ataque real: 'Un hackeo mundial: el ciberataque a la Asociación del Fútbol Argentino' (WeLiveSecurity)."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Prueba",
+      "titulo": "Diagnóstico de consultas a GDELT",
+      "detalle": "3 de 5 consultas de prueba rechazadas (HTTP 429). Conclusión: en vivo los RSS son la fuente principal y GDELT es complementario; GDELT es más valioso para el análisis histórico (decisión D8b)."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Configuración de GitHub por el autor",
+      "detalle": "GitHub Pages con origen 'GitHub Actions' y permisos de lectura y escritura para los workflows."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Creación de la rama main",
+      "detalle": "Con autorización del autor se creó la rama main y el autor la marcó como rama principal del repositorio."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Problema",
+      "titulo": "La primera publicación de la web fue rechazada",
+      "detalle": "El entorno github-pages solo permitía publicar desde la rama de desarrollo (era la principal cuando se activó Pages). El autor agregó main a las reglas del entorno y la publicación funcionó."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Hito",
+      "titulo": "Plataforma publicada",
+      "detalle": "Primera revisión oficial desde main y publicación en https://gastonaizama.github.io/Tfm/."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Pull Request #1 fusionado",
+      "detalle": "Se incorporó a main la decisión técnica D8b. El autor revisó y fusionó el Pull Request desde la web de GitHub."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Inicio de la descarga del histórico",
+      "detalle": "Se lanzó manualmente el workflow 'Completar histórico' para no esperar a que GitHub active la programación horaria."
+    },
+    {
+      "fecha": "13/10/2026",
+      "tipo": "Documentación",
+      "titulo": "Creación de esta memoria",
+      "detalle": "Documento Word generado automáticamente desde el repositorio (memoria/generar_memoria.js), con capturas de pantalla, que se actualiza con cada avance del proyecto."
+    },
+    {
+      "fecha": "13/10/2026",
+      "tipo": "Investigación",
+      "titulo": "Búsqueda inicial de incidentes conocidos",
+      "detalle": "Búsqueda web en fuentes abiertas (medios argentinos, sitios de inteligencia de amenazas, informes de empresas de seguridad). Se identificaron 3 candidatos dentro del período (Cyber Dragonz, LulzSec Muslims, REM) y 2 inmediatamente posteriores (agosto 2024). Ninguno fue cargado: quedan pendientes de validación por el autor."
+    }
   ]
 }

@@ -251,6 +251,25 @@ add(
   ], [3600, 6038]),
 );
 
+// 5.4 Búsqueda inicial de incidentes
+add(
+  H2("5.4. Búsqueda inicial de incidentes (pendiente de validación)"),
+  P("El 13/10/2026 se realizó una búsqueda inicial en fuentes abiertas para identificar ataques del período de estudio. Se consultaron medios argentinos, sitios especializados en inteligencia de amenazas e informes de empresas de seguridad (Radware, Check Point, Group-IB, entre otros). Los resultados son **candidatos**: ninguno se cargó en el archivo de incidentes hasta que el autor los valide."),
+  tabla(["Fecha", "Grupo", "Objetivo / tipo", "Fuentes encontradas", "Observaciones"], [
+    ["Agosto 2023 (día sin precisar)", "Cyber Dragonz", "Biblioteca del Congreso de la Nación · defacement", "C5N, que cita a mefiltraron.com", "Señalado como el primer ataque al país vinculado al conflicto Israel–Palestina. Fuente secundaria: falta la fecha exacta."],
+    ["≈ 22 feb 2024", "LulzSec Muslims", "Fuerzas Armadas / Ejército Argentino · filtración de datos (reivindicada)", "Zona Militar (22/02/2024), CyberShafarat, C5N, AGC News", "Reivindicación del grupo, sin confirmación oficial. Motivación declarada: apoyo de Milei a Israel. Ocurre 16 días después de la visita a Israel."],
+    ["2024 (fecha a confirmar)", "REM", "Cuentas de la AMIA y credenciales de milei.com.ar · filtración", "C5N, que cita un aviso de Birmingham Cyber Arms", "Mensaje hostil a Milei por su vínculo con Israel. Falta la fecha."],
+    ["≈ 5 ago 2024 (fuera del período)", "LulzSec Muslims", "Medio de noticias y Ministerio de Salud", "Publicación de Daily Dark Web en X", "Reivindicación «en apoyo a Palestina». Posterior al aniversario de la AMIA."],
+    ["Ago 2024 (fuera del período)", "LulzSec Muslims", "Servidor de la Fuerza Aérea Argentina", "Daily Dark Web", "Reivindicación, motivación declarada: Gaza."],
+  ], [1500, 1400, 2200, 2100, 2438]),
+  espacio(),
+  P("**Descartados por no corresponder al caso:** el hackeo de argentina.gob.ar y Mi Argentina (diciembre de 2024, sin motivación pro-Palestina), los ataques del individuo «gov.eth» (2024–2025) y el ataque de Chronus Team (2026)."),
+  P("**Observaciones metodológicas:**"),
+  V("La cobertura en prensa es escasa: la mayoría de los datos proviene de **reivindicaciones** de los propios grupos difundidas por sitios de monitoreo de la dark web. Por eso son importantes las columnas `confianza` y `verificado`."),
+  V("El ataque de LulzSec Muslims de febrero de 2024 queda **16 días** después del hecho detonante: con la ventana de 7 días aparecería como alerta informativa, y con una ventana de 14 o 21 días, como roja. Esto refuerza la necesidad del análisis de sensibilidad de la ventana."),
+  V("Varias reivindicaciones se concentran en agosto de 2024, justo después del cierre del período. Conviene evaluar si se extiende el período del caso de estudio."),
+);
+
 // 6. Clasificación
 const geo = Object.entries(config.palabras_clave.geopoliticas);
 const porPeso = (w) => geo.filter(([, p]) => p === w).map(([t]) => t).join(", ");
