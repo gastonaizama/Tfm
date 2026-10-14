@@ -480,15 +480,40 @@ add(
   nota("**Pregunta de evaluación:** ¿los ataques **hacktivistas** caen dentro de las ventanas de vigilancia con más frecuencia que los ataques **cibercriminales**? Si es así, el contexto geopolítico anticipa el hacktivismo. Si ambos caen por igual, el semáforo solo reflejaría que hay ataques todo el tiempo."),
   P("Para ello se propone etiquetar cada incidente con su **tipo de actor** (hacktivista, cibercriminal, estatal o desconocido)."),
   H2("14.3. Incidentes cargados"),
-  P(`La búsqueda inicial (14/10/2026) identificó ${candidatos.length} candidatos (\`datos/candidatos_incidentes.csv\`). El autor decidió **cargarlos todos** en \`datos/incidentes_historicos.csv\`, marcados como **no verificados**. Varias fuentes son secundarias o recogen reivindicaciones de los propios grupos, por lo que la verificación sigue pendiente. Los dos incidentes **sin fecha conocida** (REM y Stucx Team) se muestran en la página, pero no entran al cálculo.`),
+  P(`La búsqueda inicial (14/10/2026) identificó ${candidatos.filter((c) => c.estado_revision.startsWith("cargado")).length} candidatos (\`datos/candidatos_incidentes.csv\`). El autor decidió **cargarlos todos** en \`datos/incidentes_historicos.csv\`, marcados como **no verificados**. Varias fuentes son secundarias o recogen reivindicaciones de los propios grupos, por lo que la verificación sigue pendiente. Los dos incidentes **sin fecha conocida** (REM y Stucx Team) se muestran en la página, pero no entran al cálculo.`),
   tabla(["Fecha", "Actor", "Tipo", "Objetivo", "Ataque", "Confianza"],
-    candidatos.map((c) => [fechaCand(c), c.grupo, c.tipo_actor, c.objetivo, c.tipo_ataque, c.confianza]),
+    candidatos.filter((c) => c.estado_revision.startsWith("cargado")).map((c) => [fechaCand(c), c.grupo, c.tipo_actor, c.objetivo, c.tipo_ataque, c.confianza]),
     [1200, 1500, 1350, 3188, 1250, 1150]),
   espacio(),
   H2("14.4. Primeras observaciones"),
   V("La reivindicación de **LulzSec Muslims** contra datos de las Fuerzas Armadas (aprox. 22/02/2024) ocurre **16 días** después de la visita a Israel (06/02/2024): queda **fuera** de una ventana de 7 días, pero **dentro** de una de 14 o 21. Es un caso útil para el análisis de sensibilidad de la ventana."),
   V("Varios ataques de LulzSec Muslims se concentran en **agosto de 2024**, poco después de la declaración de Hamás como organización terrorista (12/07/2024) y del 30.º aniversario de la AMIA (18/07/2024). Conviene evaluar si se extiende el período de estudio hasta agosto de 2024."),
   V("El ataque al Gobierno de Río Negro (05/02/2024) ocurre un día antes de la visita a Israel, sin relación aparente: ejemplo de **coincidencia temporal sin causalidad**, importante para la discusión de resultados."),
+);
+
+// 14.5 Segunda lista
+const hechosCand = (() => {
+  const txt = fs.readFileSync(path.join(RAIZ, "datos", "candidatos_hechos_clave.csv"), "utf8").trim().split(/\r?\n/);
+  const parse = (l) => { const out = []; let cur = "", q = false;
+    for (const ch of l) { if (ch === '"') q = !q; else if (ch === "," && !q) { out.push(cur); cur = ""; } else cur += ch; }
+    out.push(cur); return out; };
+  const cab = parse(txt[0]);
+  return txt.slice(1).map((l) => Object.fromEntries(parse(l).map((v, i) => [cab[i], v])));
+})();
+const pendientes = candidatos.filter((c) => c.estado_revision === "pendiente");
+add(
+  H2("14.5. Segunda lista de candidatos (agosto 2024 – hoy)"),
+  P(`Al extender el período hasta la actualidad, se realizó una segunda búsqueda. Se identificaron **${hechosCand.length} hechos clave** y **${pendientes.length} incidentes** candidatos, pendientes de decisión del autor (\`datos/candidatos_hechos_clave.csv\` y \`datos/candidatos_incidentes.csv\`).`),
+  H3("Hechos clave candidatos"),
+  tabla(["Fecha", "Hecho", "Confianza"], hechosCand.map((h) => [h.fecha, h.titulo, h.confianza]), [1300, 7038, 1300]),
+  espacio(),
+  H3("Incidentes candidatos"),
+  tabla(["Fecha", "Actor", "Tipo", "Objetivo", "Ataque", "Confianza"],
+    pendientes.map((c) => [fechaCand(c), c.grupo, c.tipo_actor, c.objetivo, c.tipo_ataque, c.confianza]),
+    [1200, 1500, 1350, 3188, 1250, 1150]),
+  espacio(),
+  V("El **intento de DDoS contra la Cancillería (05/02/2026)** es el caso más claro de la segunda lista: la propia SIDE lo atribuyó a una campaña hacktivista contra los países del Board of Peace, y ocurre **19 días** después del anuncio de ingreso de Argentina (17/01/2026). Vuelve a quedar fuera de una ventana de 7 días y dentro de una de 21."),
+  V("Varios incidentes de la segunda lista son **reivindicaciones de grupos de ransomware** recogidas por agregadores (ransomware.live, SOCRadar), sin confirmación oficial: deben tratarse con confianza baja."),
 );
 
 // 15. Evaluación y extensión del período

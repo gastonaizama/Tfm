@@ -20,6 +20,11 @@
       "version": "0.3",
       "fecha": "14/10/2026",
       "cambios": "Carga de los 13 incidentes, columna de tipo de actor, evaluación del modelo con análisis de sensibilidad y extensión del período hasta la actualidad."
+    },
+    {
+      "version": "0.4",
+      "fecha": "14/10/2026",
+      "cambios": "Segunda lista de candidatos (agosto 2024 – hoy): 8 hechos clave y 10 incidentes, pendientes de decisión del autor."
     }
   ],
   "eventos": [
@@ -160,6 +165,12 @@
       "tipo": "Resultado",
       "titulo": "Primeros resultados preliminares",
       "detalle": "Con 21 días de ventana, 3 de 5 ataques hacktivistas con fecha caen dentro de ventanas (60 %) frente a una cobertura del 18 % (razón 3,3). Con 7 días ninguno cae dentro. El defacement de argentina.gob.ar (19/10/2023, motivación interna) cae dentro de la ventana posterior al 7 de octubre: ejemplo de falso positivo."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Investigación",
+      "titulo": "Segunda lista de candidatos (agosto 2024 – hoy)",
+      "detalle": "Para el período extendido se identificaron 8 hechos clave (segunda y tercera visita de Milei a Israel, ingreso al Board of Peace, guerra de EE. UU. e Israel contra Irán, expulsión del encargado de negocios iraní, entre otros) y 10 incidentes (entre ellos el intento de DDoS a la Cancillería del 05/02/2026, atribuido a una campaña hacktivista contra los países del Board of Peace). Guardados en datos/candidatos_hechos_clave.csv y datos/candidatos_incidentes.csv, pendientes de decisión."
     }
   ]
 }
