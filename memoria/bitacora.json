@@ -10,6 +10,11 @@
       "version": "0.2",
       "fecha": "13/10/2026",
       "cambios": "Búsqueda inicial de incidentes del caso de estudio (sección 5.4) con candidatos pendientes de validación por el autor."
+    },
+    {
+      "version": "0.2",
+      "fecha": "14/10/2026",
+      "cambios": "Búsqueda inicial de incidentes candidatos (13) y propuesta metodológica de grupo de comparación (hacktivistas vs. cibercriminales)."
     }
   ],
   "eventos": [
@@ -114,6 +119,18 @@
       "tipo": "Investigación",
       "titulo": "Búsqueda inicial de incidentes conocidos",
       "detalle": "Búsqueda web en fuentes abiertas (medios argentinos, sitios de inteligencia de amenazas, informes de empresas de seguridad). Se identificaron 3 candidatos dentro del período (Cyber Dragonz, LulzSec Muslims, REM) y 2 inmediatamente posteriores (agosto 2024). Ninguno fue cargado: quedan pendientes de validación por el autor."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Investigación",
+      "titulo": "Búsqueda inicial de incidentes candidatos",
+      "detalle": "A pedido del autor se buscaron ataques contra el Estado argentino, vinculados o no a conflictos geopolíticos. Se identificaron 13 candidatos (7 hacktivistas pro-Palestina, entre ellos Cyber Dragonz, LulzSec Muslims, REM y Stucx Team, y 6 cibercriminales o de motivación desconocida). Se guardaron en datos/candidatos_incidentes.csv, pendientes de validación por el autor."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Decisión",
+      "titulo": "Grupo de comparación para evaluar la hipótesis",
+      "detalle": "Se propuso incluir también ataques sin motivación geopolítica, etiquetados por tipo de actor, para comparar si los ataques hacktivistas se concentran en las ventanas de vigilancia más que los cibercriminales."
     }
   ]
 }

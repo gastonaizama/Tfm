@@ -447,10 +447,41 @@ add(
   N("**Cargar los ataques conocidos** del período en `datos/incidentes_historicos.csv`. Sin ellos, el modo histórico no puede mostrar alertas rojas ni evaluar la hipótesis.", "numeros5"),
   N("**Verificar los 8 hechos clave:** confirmar fechas, completar `fuente_url` y marcar `verificado = si`.", "numeros5"),
   N("Completar el nombre del autor en la portada de esta memoria.", "numeros5"),
+  N("**Revisar los 13 incidentes candidatos** de `datos/candidatos_incidentes.csv` (capítulo 14) y decidir cuáles se cargan.", "numeros5"),
   H2("13.3. Próximos pasos propuestos"),
   V("**Evaluación del modelo:** proporción de ataques ocurridos dentro de ventanas de vigilancia, días de anticipación entre detonante y ataque, y alertas sin ataques posteriores."),
   V("**Análisis de sensibilidad:** comparar ventanas de 3, 7 y 14 días y distintos umbrales."),
   V("**Fase 2:** clasificación con Claude Haiku 5.5, informe de inteligencia con Claude Sonnet 5.5 y comparación con las reglas de la Fase 1."),
+);
+
+// 14. Incidentes candidatos
+const candidatos = (() => {
+  const txt = fs.readFileSync(path.join(RAIZ, "datos", "candidatos_incidentes.csv"), "utf8").trim().split(/\r?\n/);
+  const parse = (l) => { const out = []; let cur = "", q = false;
+    for (const ch of l) { if (ch === '"') q = !q; else if (ch === "," && !q) { out.push(cur); cur = ""; } else cur += ch; }
+    out.push(cur); return out; };
+  const cab = parse(txt[0]);
+  return txt.slice(1).map((l) => Object.fromEntries(parse(l).map((v, i) => [cab[i], v])));
+})();
+const fechaCand = (c) => c.fecha_precision === "desconocida" ? "sin fecha" : c.fecha_precision === "mes" ? c.fecha.slice(0, 7) : c.fecha;
+add(
+  H1("14. Búsqueda de incidentes y diseño de la evaluación"),
+  H2("14.1. Por qué hace falta cargar incidentes"),
+  P("Los feeds RSS no guardan noticias antiguas y la consulta ciber de GDELT devuelve muy pocos resultados. Además, los grupos hacktivistas anuncian sus ataques sobre todo en Telegram y X. Por eso, sin una carga manual de incidentes, el modo histórico solo muestra alertas amarillas (detonantes) y no puede evaluar si a los hechos geopolíticos les siguieron ataques."),
+  H2("14.2. Grupo de comparación"),
+  P("A pedido del autor, la búsqueda incluyó ataques contra el Estado argentino **vinculados o no** a conflictos geopolíticos. Esto no le quita sentido al análisis de contexto; lo fortalece: los ataques sin motivación geopolítica (por ejemplo, ransomware con fines económicos) funcionan como **grupo de comparación**."),
+  nota("**Pregunta de evaluación:** ¿los ataques **hacktivistas** caen dentro de las ventanas de vigilancia con más frecuencia que los ataques **cibercriminales**? Si es así, el contexto geopolítico anticipa el hacktivismo. Si ambos caen por igual, el semáforo solo reflejaría que hay ataques todo el tiempo."),
+  P("Para ello se propone etiquetar cada incidente con su **tipo de actor** (hacktivista, cibercriminal, estatal o desconocido)."),
+  H2("14.3. Candidatos encontrados (pendientes de validación)"),
+  P(`La búsqueda inicial (14/10/2026) identificó ${candidatos.length} candidatos, guardados en \`datos/candidatos_incidentes.csv\`. **Ninguno se dio por verificado**: el autor debe revisar cada uno antes de pasarlo al archivo de incidentes. Varias fuentes son secundarias o recogen reivindicaciones de los propios grupos.`),
+  tabla(["Fecha", "Actor", "Tipo", "Objetivo", "Ataque", "Confianza"],
+    candidatos.map((c) => [fechaCand(c), c.grupo, c.tipo_actor, c.objetivo, c.tipo_ataque, c.confianza]),
+    [1200, 1500, 1350, 3188, 1250, 1150]),
+  espacio(),
+  H2("14.4. Primeras observaciones"),
+  V("La reivindicación de **LulzSec Muslims** contra datos de las Fuerzas Armadas (aprox. 22/02/2024) ocurre **16 días** después de la visita a Israel (06/02/2024): queda **fuera** de una ventana de 7 días, pero **dentro** de una de 14 o 21. Es un caso útil para el análisis de sensibilidad de la ventana."),
+  V("Varios ataques de LulzSec Muslims se concentran en **agosto de 2024**, poco después de la declaración de Hamás como organización terrorista (12/07/2024) y del 30.º aniversario de la AMIA (18/07/2024). Conviene evaluar si se extiende el período de estudio hasta agosto de 2024."),
+  V("El ataque al Gobierno de Río Negro (05/02/2024) ocurre un día antes de la visita a Israel, sin relación aparente: ejemplo de **coincidencia temporal sin causalidad**, importante para la discusión de resultados."),
 );
 
 // Anexo A: bitácora
