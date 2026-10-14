@@ -172,6 +172,11 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
 - **Motivo:** la búsqueda de incidentes mostró varios ataques de LulzSec Muslims en agosto de 2024, inmediatamente después del período original.
 - **Implementación:** la descarga por partes de GDELT conserva lo ya descargado y solo agrega los tramos nuevos. Un tramo que antes terminaba en el límite anterior se vuelve a descargar completo. Pasa de 196 a unos 620 tramos, por lo que el histórico tardará varios días más en completarse.
 
+### D29. Robustez: evaluación con y sin los incidentes de confianza baja
+- **Contexto:** la segunda lista de candidatos (agosto 2024 – hoy) incluye varias reivindicaciones de grupos de ransomware sin confirmación oficial.
+- **Decisión (del autor, 14/10/2026):** cargar **todos** los candidatos, igual que en la primera lista, y calcular la evaluación en dos variantes: con todos los incidentes y solo con los de confianza media o alta. La web permite alternar entre ambas.
+- **Motivo:** mantener el mismo criterio en todo el período y no vaciar el grupo de comparación (la mayoría de los incidentes de confianza baja son cibercriminales), sin resignar rigor. Si las conclusiones se mantienen en ambas variantes, el resultado es más robusto.
+
 ## F. Fase 2 (diseño previsto)
 
 ### D25. Modelos y contrato de datos de la IA

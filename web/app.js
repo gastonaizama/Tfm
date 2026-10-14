@@ -270,14 +270,20 @@ function itemEvento(e) {
 
 // ---------- evaluación del modelo ----------
 function renderEvaluacion() {
-  const ev = estado.datos.evaluacion;
+  const variantes = estado.datos.evaluacion || {};
+  const clave = estado.variante || "todos";
+  const ev = variantes.ventanas ? variantes : variantes[clave];
   if (!ev || !ev.ventanas || !ev.ventanas.length) return;
   const grupos = ["hacktivista", "cibercriminal", "desconocido", "estatal", "detectado_automaticamente"]
     .filter((g) => ev.ventanas.some((v) => v.grupos[g] && v.grupos[g].n));
   const actual = estado.datos.parametros.ventana_vigilancia_dias;
   const celda = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n} (${x.pct_dentro}%)` +
     (x.razon !== null ? `<br><small>razón ${x.razon}${x.anticipacion_mediana !== null ? ` · ${x.anticipacion_mediana} d` : ""}</small>` : "");
-  $("evaluacion").innerHTML = `
+  const selector = variantes.ventanas ? "" : `<p class="metodologia"><label>Incidentes incluidos:
+    <select id="variante-eval"><option value="todos"${clave === "todos" ? " selected" : ""}>Todos</option>
+    <option value="confianza_media_alta"${clave === "confianza_media_alta" ? " selected" : ""}>Solo confianza media o alta</option></select></label>
+    · Si las conclusiones se mantienen en ambos casos, el resultado es más sólido.</p>`;
+  $("evaluacion").innerHTML = selector + `
     <p class="metodologia">Período evaluado: ${fechaLarga(ev.inicio)} – ${fechaLarga(ev.fin)} · ${ev.detonantes} días detonantes.
     Cada celda muestra cuántos ataques cayeron <b>dentro</b> de una ventana de vigilancia. La <b>cobertura</b> es el porcentaje de días cubiertos por ventanas,
     es decir, lo esperable por azar. Una <b>razón</b> mayor que 1 significa que ese tipo de actor ataca dentro de las ventanas más de lo esperable por azar.
@@ -287,6 +293,8 @@ function renderEvaluacion() {
       <td>${v.cobertura_pct}%</td>${grupos.map((g) => `<td>${celda(v.grupos[g])}</td>`).join("")}</tr>`).join("")}
     </tbody></table></div>
     <p class="metodologia">⚠️ Resultados preliminares: pocos incidentes y la mayoría sin verificar. Sirven para mostrar el método, no para sacar conclusiones.</p>`;
+  const sel = $("variante-eval");
+  if (sel) sel.onchange = () => { estado.variante = sel.value; renderEvaluacion(); };
 }
 function renderSinFecha() {
   const sf = estado.datos.incidentes_sin_fecha || [];

@@ -107,3 +107,15 @@ class TestIncidentes(unittest.TestCase):
         self.assertFalse(con_fecha & sin_fecha)
         for e in historico.cargar_incidentes_sin_fecha():
             self.assertEqual(e["fecha_precision"], "desconocida")
+
+
+class TestFiltroConfianza(unittest.TestCase):
+    def test_excluye_confianza_baja(self):
+        from monitor import evaluacion
+        evs = [ev("h", "2024-02-06", "geo", origen="hecho_clave"),
+               {**ev("a1", "2024-02-09", "ataque", origen="incidente_csv"), "tipo_actor": "hacktivista", "confianza": "baja"},
+               {**ev("a2", "2024-02-10", "ataque", origen="incidente_csv"), "tipo_actor": "hacktivista", "confianza": "alta"}]
+        todos = evaluacion.evaluar(evs, SEM, [7], "2024-02-01", "2024-03-31")
+        filtrado = evaluacion.evaluar(evs, SEM, [7], "2024-02-01", "2024-03-31", confianzas={"media", "alta"})
+        self.assertEqual(todos["ventanas"][0]["grupos"]["hacktivista"]["n"], 2)
+        self.assertEqual(filtrado["ventanas"][0]["grupos"]["hacktivista"]["n"], 1)
