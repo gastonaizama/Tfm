@@ -14,6 +14,10 @@ Para cada tamaño de ventana (análisis de sensibilidad) y cada tipo de actor
 - anticipacion_mediana: días entre el último detonante y el ataque (solo los de dentro).
 
 El grupo de comparación (cibercriminales) debería dar una razón cercana a 1.
+
+Con `confianzas` se puede restringir la evaluación a los incidentes cargados a mano con
+cierto nivel de confianza (por ejemplo {"media", "alta"}) para comprobar que las
+conclusiones se mantienen sin los datos más débiles (análisis de robustez).
 """
 from datetime import date, timedelta
 from statistics import median
@@ -27,12 +31,15 @@ def _d(s: str) -> date:
     return date.fromisoformat(s[:10])
 
 
-def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio: str, fin: str) -> dict:
+def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio: str, fin: str,
+            confianzas: set[str] | None = None) -> dict:
     ini, fn = _d(inicio), _d(fin)
     total_dias = (fn - ini).days + 1
     detonantes = semaforo.dias_detonantes(eventos, cfg_semaforo["min_fuentes_distintas_por_dia"])
     dias_detonantes = sorted(_d(d) for d in detonantes)
-    ataques = [e for e in eventos if e["carril"] == "ataque" and ini <= _d(e["dia"]) <= fn]
+    ataques = [e for e in eventos if e["carril"] == "ataque" and ini <= _d(e["dia"]) <= fn
+               and (confianzas is None or e.get("origen") != "incidente_csv"
+                    or (e.get("confianza") or "").lower() in confianzas)]
 
     resultados = []
     for v in ventanas:
@@ -73,4 +80,5 @@ def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio
         resultados.append({"ventana_dias": v, "cobertura_pct": round(cobertura * 100, 1),
                            "periodos": len(periodos), "grupos": salida})
     return {"inicio": ini.isoformat(), "fin": fn.isoformat(), "dias": total_dias,
+            "confianzas": sorted(confianzas) if confianzas else "todas",
             "detonantes": len(dias_detonantes), "ventanas": resultados}

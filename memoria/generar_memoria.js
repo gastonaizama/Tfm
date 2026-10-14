@@ -369,7 +369,7 @@ add(
 add(
   H1("10. Pruebas y verificación"),
   H2("10.1. Pruebas automáticas"),
-  P("El archivo `tests/test_reglas.py` contiene 15 pruebas que se ejecutan antes de cada revisión. Si alguna falla, la revisión se detiene y la web publicada no cambia."),
+  P("El archivo `tests/test_reglas.py` contiene 16 pruebas que se ejecutan antes de cada revisión. Si alguna falla, la revisión se detiene y la web publicada no cambia."),
   tabla(["Prueba", "Qué comprueba"], [
     ["Hecho geopolítico", "«embajada argentina a Jerusalén» se clasifica como geopolítico"],
     ["Geo débil", "«Argentina votó en la ONU…» (1 punto) se descarta"],
@@ -386,6 +386,7 @@ add(
     ["Ventana configurable", "Con 3 días, la ventana se cierra antes"],
     ["Evaluación", "Cálculo de cobertura, razón y anticipación por tipo de actor"],
     ["Incidentes sin fecha", "No entran al cálculo ni a la línea de tiempo"],
+    ["Filtro por confianza", "La variante media/alta excluye los incidentes de confianza baja"],
   ], [2600, 7038]),
   H2("10.2. Verificaciones con datos reales"),
   tabla(["Ejecución", "Resultado", "Observación"], [
@@ -439,6 +440,7 @@ add(
     ["D26", "Grupo de comparación por tipo de actor", "Evitar sesgo de confirmación"],
     ["D27", "Incidentes sin fecha fuera del cálculo", "No distorsionar la evaluación"],
     ["D28", "Período extendido hasta la actualidad", "Incluir la ola de ataques de agosto de 2024"],
+    ["D29", "Evaluación con y sin incidentes de confianza baja", "Robustez de las conclusiones"],
   ], [1100, 4600, 3938]),
 );
 
@@ -453,8 +455,7 @@ add(
   N("**Cargar los ataques conocidos**: **hecho el 14/10/2026** (13 incidentes en `datos/incidentes_historicos.csv`). Queda ampliarlo para el período extendido.", "numeros5"),
   N("**Verificar los 8 hechos clave:** confirmar fechas, completar `fuente_url` y marcar `verificado = si`.", "numeros5"),
   N("Completar el nombre del autor en la portada de esta memoria.", "numeros5"),
-  N("**Verificar los 13 incidentes cargados** (capítulo 14) y averiguar las fechas de REM y Stucx Team.", "numeros5"),
-  N("Agregar hechos clave e incidentes posteriores a julio de 2024, ya que el período se extendió hasta la actualidad.", "numeros5"),
+  N("**Verificar los 23 incidentes y los 16 hechos clave cargados** (capítulo 14) y averiguar las fechas de REM y Stucx Team.", "numeros5"),
   H2("13.3. Próximos pasos propuestos"),
   V("**Evaluación del modelo:** proporción de ataques ocurridos dentro de ventanas de vigilancia, días de anticipación entre detonante y ataque, y alertas sin ataques posteriores."),
   V("**Análisis de sensibilidad:** comparar ventanas de 3, 7 y 14 días y distintos umbrales."),
@@ -480,9 +481,9 @@ add(
   nota("**Pregunta de evaluación:** ¿los ataques **hacktivistas** caen dentro de las ventanas de vigilancia con más frecuencia que los ataques **cibercriminales**? Si es así, el contexto geopolítico anticipa el hacktivismo. Si ambos caen por igual, el semáforo solo reflejaría que hay ataques todo el tiempo."),
   P("Para ello se propone etiquetar cada incidente con su **tipo de actor** (hacktivista, cibercriminal, estatal o desconocido)."),
   H2("14.3. Incidentes cargados"),
-  P(`La búsqueda inicial (14/10/2026) identificó ${candidatos.filter((c) => c.estado_revision.startsWith("cargado")).length} candidatos (\`datos/candidatos_incidentes.csv\`). El autor decidió **cargarlos todos** en \`datos/incidentes_historicos.csv\`, marcados como **no verificados**. Varias fuentes son secundarias o recogen reivindicaciones de los propios grupos, por lo que la verificación sigue pendiente. Los dos incidentes **sin fecha conocida** (REM y Stucx Team) se muestran en la página, pero no entran al cálculo.`),
+  P(`La búsqueda inicial (14/10/2026) identificó 13 candidatos (\`datos/candidatos_incidentes.csv\`). El autor decidió **cargarlos todos** en \`datos/incidentes_historicos.csv\`, marcados como **no verificados**. Varias fuentes son secundarias o recogen reivindicaciones de los propios grupos, por lo que la verificación sigue pendiente. Los dos incidentes **sin fecha conocida** (REM y Stucx Team) se muestran en la página, pero no entran al cálculo.`),
   tabla(["Fecha", "Actor", "Tipo", "Objetivo", "Ataque", "Confianza"],
-    candidatos.filter((c) => c.estado_revision.startsWith("cargado")).map((c) => [fechaCand(c), c.grupo, c.tipo_actor, c.objetivo, c.tipo_ataque, c.confianza]),
+    candidatos.slice(0, 13).map((c) => [fechaCand(c), c.grupo, c.tipo_actor, c.objetivo, c.tipo_ataque, c.confianza]),
     [1200, 1500, 1350, 3188, 1250, 1150]),
   espacio(),
   H2("14.4. Primeras observaciones"),
@@ -500,10 +501,10 @@ const hechosCand = (() => {
   const cab = parse(txt[0]);
   return txt.slice(1).map((l) => Object.fromEntries(parse(l).map((v, i) => [cab[i], v])));
 })();
-const pendientes = candidatos.filter((c) => c.estado_revision === "pendiente");
+const pendientes = candidatos.slice(13);
 add(
   H2("14.5. Segunda lista de candidatos (agosto 2024 – hoy)"),
-  P(`Al extender el período hasta la actualidad, se realizó una segunda búsqueda. Se identificaron **${hechosCand.length} hechos clave** y **${pendientes.length} incidentes** candidatos, pendientes de decisión del autor (\`datos/candidatos_hechos_clave.csv\` y \`datos/candidatos_incidentes.csv\`).`),
+  P(`Al extender el período hasta la actualidad, se realizó una segunda búsqueda. Se identificaron **${hechosCand.length} hechos clave** y **10 incidentes** candidatos (\`datos/candidatos_hechos_clave.csv\` y \`datos/candidatos_incidentes.csv\`). El autor decidió **cargarlos todos**, sin verificar, y evaluar el modelo también sin los incidentes de confianza baja (decisión D29).`),
   H3("Hechos clave candidatos"),
   tabla(["Fecha", "Hecho", "Confianza"], hechosCand.map((h) => [h.fecha, h.titulo, h.confianza]), [1300, 7038, 1300]),
   espacio(),
@@ -518,7 +519,9 @@ add(
 
 // 15. Evaluación y extensión del período
 const datosWeb = JSON.parse(fs.readFileSync(path.join(RAIZ, "web", "datos.json"), "utf8"));
-const ev = datosWeb.evaluacion;
+const evTodas = datosWeb.evaluacion.todos || datosWeb.evaluacion;
+const evFiltro = datosWeb.evaluacion.confianza_media_alta;
+const ev = evTodas;
 const celdaEv = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n} (${x.pct_dentro} %)` + (x.razon !== null ? `\nrazón ${x.razon}` : "");
 add(
   H1("15. Evaluación del modelo"),
@@ -529,13 +532,23 @@ add(
   P("Se evalúan ventanas de 3, 7, 14 y 21 días (**análisis de sensibilidad**). La de 7 días es la que usa el semáforo."),
   H2("15.2. Resultados preliminares"),
   P(`Período evaluado: ${ev.inicio} a ${ev.fin} (${ev.dias} días, ${ev.detonantes} días detonantes). Datos al ${datosWeb.generado.slice(0, 10)}.`),
+  H3("Con todos los incidentes"),
   tabla(["Ventana", "Cobertura", "Hacktivista", "Cibercriminal", "Desconocido"],
     ev.ventanas.map((v) => [`${v.ventana_dias} días`, `${v.cobertura_pct} %`, celdaEv(v.grupos.hacktivista), celdaEv(v.grupos.cibercriminal), celdaEv(v.grupos.desconocido)]),
     [1500, 1500, 2300, 2169, 2169]),
   espacio(),
+  ...(evFiltro ? [
+    H3("Solo incidentes de confianza media o alta (robustez)"),
+    tabla(["Ventana", "Cobertura", "Hacktivista", "Cibercriminal", "Desconocido"],
+      evFiltro.ventanas.map((v) => [`${v.ventana_dias} días`, `${v.cobertura_pct} %`, celdaEv(v.grupos.hacktivista), celdaEv(v.grupos.cibercriminal), celdaEv(v.grupos.desconocido)]),
+      [1500, 1500, 2300, 2169, 2169]),
+    espacio(),
+  ] : []),
   ...figura("web_evaluacion.png", "Sección «Evaluación del modelo» en la página, con los incidentes sin fecha al pie."),
   H2("15.3. Lectura de los resultados"),
-  V("Con la ventana de **7 días** ningún ataque hacktivista cae dentro; con **21 días**, 3 de 5 (razón superior a 3). Esto sugiere que, si existe relación, el hacktivismo **no reacciona en una semana**, sino en dos o tres. Es una hipótesis a confirmar con más datos."),
+  V("Con la ventana de **7 días** (la del semáforo) **ningún** ataque hacktivista cae dentro de una ventana. Con **21 días**, la razón de los hacktivistas es de alrededor de **2** (1,92 con todos los incidentes y 1,68 solo con los de confianza media o alta), mientras que la de los cibercriminales queda **por debajo de 1** (0,75 y 0,84)."),
+  V("El patrón se mantiene en las dos variantes, lo que sugiere que no depende de los datos más débiles (**robustez**)."),
+  V("Lectura preliminar: si existe relación entre geopolítica y hacktivismo contra Argentina, la reacción no es inmediata, sino que ocurre en un plazo de **dos a tres semanas**. Dos casos lo ilustran: LulzSec Muslims (16 días después de la visita a Israel de 2024) y el intento de DDoS a la Cancillería (19 días después del ingreso al Board of Peace). Esto pone en discusión la ventana de 7 días fijada en los requisitos iniciales."),
   V("El defacement de argentina.gob.ar (19/10/2023), de motivación política interna, cae dentro de la ventana abierta tras el 7 de octubre de 2023 y pone el semáforo en rojo: es un **falso positivo** que muestra el límite de un modelo basado solo en fechas."),
   nota("**Advertencia:** son muy pocos incidentes y casi todos sin verificar. Estos números ilustran el **método**; no permiten conclusiones. Al completarse el histórico de GDELT y verificarse los incidentes, la tabla se recalcula sola."),
   H2("15.4. Extensión del período hasta la actualidad"),

@@ -122,9 +122,14 @@ def ejecutar(recolectar_en_vivo: bool = True) -> dict:
     resultado = semaforo.calcular(eventos, config["semaforo"], hoy)
 
     cfg_eval = config.get("evaluacion", {})
-    resultado_eval = evaluacion.evaluar(
-        eventos, config["semaforo"], cfg_eval.get("ventanas_sensibilidad", [config["semaforo"]["ventana_vigilancia_dias"]]),
-        cfg_eval.get("inicio", config["historico"]["inicio"]), hoy.isoformat())
+    ventanas = cfg_eval.get("ventanas_sensibilidad", [config["semaforo"]["ventana_vigilancia_dias"]])
+    inicio_eval = cfg_eval.get("inicio", config["historico"]["inicio"])
+    # Dos variantes: con todos los incidentes y solo con los de confianza media o alta (robustez)
+    resultado_eval = {
+        "todos": evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval, hoy.isoformat()),
+        "confianza_media_alta": evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval,
+                                                   hoy.isoformat(), confianzas={"media", "alta"}),
+    }
 
     # Fase 2 (desactivada por defecto): clasificación con Haiku e informe con Sonnet.
     informe = ia.procesar_si_esta_activada(config, eventos, resultado)

@@ -25,6 +25,11 @@
       "version": "0.4",
       "fecha": "14/10/2026",
       "cambios": "Segunda lista de candidatos (agosto 2024 – hoy): 8 hechos clave y 10 incidentes, pendientes de decisión del autor."
+    },
+    {
+      "version": "0.5",
+      "fecha": "14/10/2026",
+      "cambios": "Carga de la segunda lista (8 hechos clave y 10 incidentes) y evaluación con filtro por confianza (análisis de robustez)."
     }
   ],
   "eventos": [
@@ -171,6 +176,24 @@
       "tipo": "Investigación",
       "titulo": "Segunda lista de candidatos (agosto 2024 – hoy)",
       "detalle": "Para el período extendido se identificaron 8 hechos clave (segunda y tercera visita de Milei a Israel, ingreso al Board of Peace, guerra de EE. UU. e Israel contra Irán, expulsión del encargado de negocios iraní, entre otros) y 10 incidentes (entre ellos el intento de DDoS a la Cancillería del 05/02/2026, atribuido a una campaña hacktivista contra los países del Board of Peace). Guardados en datos/candidatos_hechos_clave.csv y datos/candidatos_incidentes.csv, pendientes de decisión."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Pull Request #2 fusionado",
+      "detalle": "El autor fusionó el PR con los 13 incidentes, la evaluación del modelo y el período extendido. Antes se resolvió un conflicto en web/datos.json causado por las actualizaciones automáticas de main."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Decisión",
+      "titulo": "Carga de la segunda lista con filtro por confianza",
+      "detalle": "El autor eligió cargar todos los candidatos (opción A) para mantener el mismo criterio en todo el período y no vaciar el grupo de comparación. Se agregó a la evaluación una segunda variante que solo usa incidentes de confianza media o alta."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Resultado",
+      "titulo": "Resultados con 23 incidentes y 16 hechos clave",
+      "detalle": "Con ventana de 21 días, los hacktivistas tienen una razón de 1,92 (todos los incidentes) y 1,68 (solo confianza media/alta), frente a 0,75 y 0,84 de los cibercriminales. Con 7 días, ningún ataque hacktivista cae dentro de las ventanas. El patrón se mantiene en ambas variantes."
     }
   ]
 }
