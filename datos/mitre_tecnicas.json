@@ -58,6 +58,13 @@
   ],
   "url": "https://attack.mitre.org/techniques/T1213"
  },
+ "T1485": {
+  "nombre": "Data Destruction",
+  "tacticas": [
+   "impact"
+  ],
+  "url": "https://attack.mitre.org/techniques/T1485"
+ },
  "T1498": {
   "nombre": "Network Denial of Service",
   "tacticas": [

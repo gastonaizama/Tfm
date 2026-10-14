@@ -82,3 +82,28 @@ class TestSemaforo(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestEvaluacion(unittest.TestCase):
+    def test_razon_y_cobertura(self):
+        from monitor import evaluacion
+        evs = [ev("h", "2024-02-06", "geo", origen="hecho_clave"),
+               {**ev("a1", "2024-02-09", "ataque", origen="incidente_csv"), "tipo_actor": "hacktivista"},
+               {**ev("a2", "2024-03-20", "ataque", origen="incidente_csv"), "tipo_actor": "cibercriminal"}]
+        r = evaluacion.evaluar(evs, SEM, [7], "2024-02-01", "2024-03-31")
+        v = r["ventanas"][0]
+        self.assertEqual(v["grupos"]["hacktivista"]["dentro"], 1)
+        self.assertEqual(v["grupos"]["cibercriminal"]["dentro"], 0)
+        self.assertEqual(v["grupos"]["hacktivista"]["anticipacion_mediana"], 3)
+        self.assertAlmostEqual(v["cobertura_pct"], round(8 / 60 * 100, 1))
+        self.assertGreater(v["grupos"]["hacktivista"]["razon"], 1)
+
+
+class TestIncidentes(unittest.TestCase):
+    def test_fecha_desconocida_queda_fuera(self):
+        from monitor import historico
+        con_fecha = {e["id"] for e in historico.cargar_incidentes()}
+        sin_fecha = {e["id"] for e in historico.cargar_incidentes_sin_fecha()}
+        self.assertFalse(con_fecha & sin_fecha)
+        for e in historico.cargar_incidentes_sin_fecha():
+            self.assertEqual(e["fecha_precision"], "desconocida")

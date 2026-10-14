@@ -45,7 +45,9 @@ async function iniciar() {
 
   $("btn-vivo").onclick = () => modoVivo();
   $("btn-hist").onclick = () => modoHistorico();
-  $("btn-caso").onclick = () => modoHistorico();
+  const presets = d.parametros.periodos_web || [];
+  $("presets").innerHTML = presets.map((p, i) => `<button type="button" class="secundario" data-i="${i}">${esc(p.nombre)}</button>`).join("");
+  $("presets").querySelectorAll("button").forEach((b) => (b.onclick = () => modoHistorico(presets[+b.dataset.i])));
   $("desde").onchange = $("hasta").onchange = () => {
     estado.desde = $("desde").value; estado.hasta = $("hasta").value;
     if (estado.desde > estado.hasta) [estado.desde, estado.hasta] = [estado.hasta, estado.desde];
@@ -54,7 +56,7 @@ async function iniciar() {
   };
   $("ver-info").onchange = renderAlertas;
   let t; window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(dibujarLinea, 150); });
-  renderFuentes(); renderMetodologia(); renderInforme();
+  renderFuentes(); renderMetodologia(); renderInforme(); renderEvaluacion(); renderSinFecha();
   modoVivo();
 }
 
@@ -72,12 +74,14 @@ function modoVivo() {
   estado.desde = sumarDias(estado.hasta, -(estado.datos.parametros.dias_modo_vivo || 30));
   render();
 }
-function modoHistorico() {
+function modoHistorico(preset) {
   marcarModo("historico");
   const h = estado.datos.historico_gdelt || {};
   $("aviso-hist").hidden = !!h.completo;
-  estado.desde = estado.datos.parametros.historico.inicio;
-  estado.hasta = estado.datos.parametros.historico.fin;
+  const presets = estado.datos.parametros.periodos_web || [];
+  const p = preset || presets[presets.length - 1] || estado.datos.parametros.historico;
+  estado.desde = p.inicio;
+  estado.hasta = p.fin;
   render();
 }
 
@@ -255,9 +259,39 @@ function chipsMitre(tecnicas) {
     return `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener" title="${esc(m?.nombre || "")}">${esc(t)}${m ? " · " + esc(m.nombre) : ""}</a>`;
   }).join("");
 }
+const ACTOR_TXT = { hacktivista: "Hacktivista", cibercriminal: "Cibercriminal", estatal: "Estatal", desconocido: "Actor desconocido", detectado_automaticamente: "Detectados en noticias" };
 function itemEvento(e) {
   const grupos = (e.grupos || []).map((g) => `<span class="chip">👥 ${esc(g)}</span>`).join("");
-  return `<li>${enlace(e.url, e.titulo)} <span class="fecha">— ${esc(e.fuente)} · ${ORIGEN_TXT[e.origen] || e.origen}</span> ${grupos}${chipsMitre(e.tecnicas)}</li>`;
+  const actor = e.tipo_actor ? `<span class="chip">${esc(ACTOR_TXT[e.tipo_actor] || e.tipo_actor)}</span>` : "";
+  const aprox = e.fecha_precision && e.fecha_precision !== "dia" ? `<span class="chip" title="La fecha no es exacta">fecha ${esc(e.fecha_precision)}</span>` : "";
+  const verif = e.origen === "incidente_csv" && e.verificado !== "si" ? `<span class="chip" title="Pendiente de verificación por el analista">sin verificar</span>` : "";
+  return `<li>${enlace(e.url, e.titulo)} <span class="fecha">— ${esc(e.fuente)} · ${ORIGEN_TXT[e.origen] || e.origen}</span> ${actor}${grupos}${aprox}${verif}${chipsMitre(e.tecnicas)}</li>`;
+}
+
+// ---------- evaluación del modelo ----------
+function renderEvaluacion() {
+  const ev = estado.datos.evaluacion;
+  if (!ev || !ev.ventanas || !ev.ventanas.length) return;
+  const grupos = ["hacktivista", "cibercriminal", "desconocido", "estatal", "detectado_automaticamente"]
+    .filter((g) => ev.ventanas.some((v) => v.grupos[g] && v.grupos[g].n));
+  const actual = estado.datos.parametros.ventana_vigilancia_dias;
+  const celda = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n} (${x.pct_dentro}%)` +
+    (x.razon !== null ? `<br><small>razón ${x.razon}${x.anticipacion_mediana !== null ? ` · ${x.anticipacion_mediana} d` : ""}</small>` : "");
+  $("evaluacion").innerHTML = `
+    <p class="metodologia">Período evaluado: ${fechaLarga(ev.inicio)} – ${fechaLarga(ev.fin)} · ${ev.detonantes} días detonantes.
+    Cada celda muestra cuántos ataques cayeron <b>dentro</b> de una ventana de vigilancia. La <b>cobertura</b> es el porcentaje de días cubiertos por ventanas,
+    es decir, lo esperable por azar. Una <b>razón</b> mayor que 1 significa que ese tipo de actor ataca dentro de las ventanas más de lo esperable por azar.
+    El grupo de comparación son los cibercriminales. «d» es la mediana de días entre el detonante y el ataque.</p>
+    <div class="tabla-scroll"><table><thead><tr><th>Ventana</th><th>Cobertura</th>${grupos.map((g) => `<th>${ACTOR_TXT[g]}</th>`).join("")}</tr></thead><tbody>
+    ${ev.ventanas.map((v) => `<tr${v.ventana_dias === actual ? ' class="actual"' : ""}><td>${v.ventana_dias} días${v.ventana_dias === actual ? " (semáforo)" : ""}</td>
+      <td>${v.cobertura_pct}%</td>${grupos.map((g) => `<td>${celda(v.grupos[g])}</td>`).join("")}</tr>`).join("")}
+    </tbody></table></div>
+    <p class="metodologia">⚠️ Resultados preliminares: pocos incidentes y la mayoría sin verificar. Sirven para mostrar el método, no para sacar conclusiones.</p>`;
+}
+function renderSinFecha() {
+  const sf = estado.datos.incidentes_sin_fecha || [];
+  $("sin-fecha").hidden = !sf.length;
+  $("sin-fecha").innerHTML = `<p><b>Incidentes sin fecha conocida (${sf.length})</b>: no se dibujan en la línea de tiempo ni entran al cálculo hasta conocer la fecha.</p><ul>${sf.map(itemEvento).join("")}</ul>`;
 }
 
 // ---------- alertas ----------

@@ -3,7 +3,7 @@ import hashlib
 import time
 from datetime import datetime, timedelta, timezone
 
-from . import historico, mitre, semaforo
+from . import evaluacion, historico, mitre, semaforo
 from .clasificador import Clasificador
 from .config import (ARCHIVO_ESTADO_FUENTES, ARCHIVO_GDELT_HIST, ARCHIVO_NOTICIAS, ARCHIVO_SALIDA_WEB, cargar_config,
                      cargar_mapeo_mitre, guardar_json, leer_json)
@@ -121,12 +121,19 @@ def ejecutar(recolectar_en_vivo: bool = True) -> dict:
     hoy = datetime.now(timezone.utc).date()
     resultado = semaforo.calcular(eventos, config["semaforo"], hoy)
 
+    cfg_eval = config.get("evaluacion", {})
+    resultado_eval = evaluacion.evaluar(
+        eventos, config["semaforo"], cfg_eval.get("ventanas_sensibilidad", [config["semaforo"]["ventana_vigilancia_dias"]]),
+        cfg_eval.get("inicio", config["historico"]["inicio"]), hoy.isoformat())
+
     # Fase 2 (desactivada por defecto): clasificación con Haiku e informe con Sonnet.
     informe = ia.procesar_si_esta_activada(config, eventos, resultado)
 
     salida = {
         "generado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "parametros": {**config["semaforo"], "historico": config["historico"],
+                       "periodos_web": [{**p, "fin": hoy.isoformat() if p["fin"] == "hoy" else p["fin"]}
+                                        for p in config.get("periodos_web", [])],
                        "ia_activada": config["ia"]["activada"]},
         "actual": resultado["actual"],
         "periodos": resultado["periodos"],
@@ -136,6 +143,8 @@ def ejecutar(recolectar_en_vivo: bool = True) -> dict:
         "mitre": catalogo,
         "fuentes": leer_json(ARCHIVO_ESTADO_FUENTES, {}),
         "historico_gdelt": _estado_historico(),
+        "evaluacion": resultado_eval,
+        "incidentes_sin_fecha": historico.cargar_incidentes_sin_fecha(),
         "informe_ia": informe,
     }
     guardar_json(ARCHIVO_SALIDA_WEB, salida, compacto=True)

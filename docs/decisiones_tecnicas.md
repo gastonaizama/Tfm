@@ -155,6 +155,23 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
 
 ---
 
+## E2. Evaluación (agregado el 14/10/2026)
+
+### D26. Grupo de comparación por tipo de actor
+- **Contexto:** el autor decidió incluir ataques contra el Estado argentino **vinculados o no** a conflictos geopolíticos.
+- **Decisión:** cada incidente lleva `tipo_actor` (hacktivista / cibercriminal / estatal / desconocido). El módulo `monitor/evaluacion.py` compara, para cada tipo, el porcentaje de ataques dentro de las ventanas con la **cobertura** (porcentaje de días cubiertos por ventanas, es decir, lo esperable por azar). La métrica principal es la **razón** entre ambos.
+- **Motivo:** sin grupo de comparación el análisis queda sesgado (solo se mirarían los casos que confirman la hipótesis). Si los hacktivistas tienen una razón claramente mayor que 1 y los cibercriminales cercana a 1, el contexto geopolítico anticipa el hacktivismo.
+- **Sensibilidad:** se evalúan ventanas de 3, 7, 14 y 21 días (`evaluacion.ventanas_sensibilidad`).
+
+### D27. Incidentes con fecha desconocida
+- **Decisión:** la columna `fecha_precision` (dia / mes / aproximada / desconocida) acompaña a cada incidente. Los de fecha **desconocida** se listan en la página, pero **no** entran a la línea de tiempo ni al semáforo ni a la evaluación.
+- **Motivo:** asignarles una fecha arbitraria distorsionaría los resultados. Las fechas por mes se ubican el día 1 y se señalan en la página como imprecisas.
+
+### D28. Extensión del período histórico hasta la actualidad
+- **Decisión (del autor, 14/10/2026):** el período histórico pasa a ser **01/08/2023 – 11/10/2026**, el día anterior al inicio del monitoreo en vivo. El caso de estudio original (ago 2023 – jul 2024) se conserva como período predefinido en la web.
+- **Motivo:** la búsqueda de incidentes mostró varios ataques de LulzSec Muslims en agosto de 2024, inmediatamente después del período original.
+- **Implementación:** la descarga por partes de GDELT conserva lo ya descargado y solo agrega los tramos nuevos. Un tramo que antes terminaba en el límite anterior se vuelve a descargar completo. Pasa de 196 a unos 620 tramos, por lo que el histórico tardará varios días más en completarse.
+
 ## F. Fase 2 (diseño previsto)
 
 ### D25. Modelos y contrato de datos de la IA

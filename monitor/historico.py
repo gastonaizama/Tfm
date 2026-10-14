@@ -1,4 +1,4 @@
-"""Modo histórico (agosto 2023 – julio 2024).
+"""Modo histórico (desde agosto 2023 hasta el inicio del monitoreo en vivo).
 
 Los feeds RSS solo muestran las últimas noticias, por eso el histórico se arma con:
 1. GDELT: se descarga UNA vez (comando `python -m monitor historico`) y se guarda en
@@ -40,31 +40,53 @@ def cargar_hechos_clave() -> list[dict]:
     } for f in _leer_csv(ARCHIVO_HECHOS)]
 
 
+TIPOS_ACTOR = ("hacktivista", "cibercriminal", "estatal", "desconocido")
+
+
+def _leer_incidentes() -> list[dict]:
+    filas = _leer_csv(ARCHIVO_INCIDENTES)
+    for f in filas:
+        tipo = (f.get("tipo_actor") or "desconocido").lower()
+        f["tipo_actor"] = tipo if tipo in TIPOS_ACTOR else "desconocido"
+        f["fecha_precision"] = (f.get("fecha_precision") or "dia").lower()
+    return filas
+
+
+def _evento_incidente(f: dict) -> dict:
+    tecnicas = [t.strip() for t in f.get("tecnicas_mitre", "").replace(",", ";").split(";") if t.strip()]
+    titulo = f"{f.get('grupo') or 'Actor desconocido'} → {f.get('objetivo') or f.get('dominio_objetivo') or 'objetivo argentino'}"
+    if f.get("tipo_ataque"):
+        titulo += f" ({f['tipo_ataque']})"
+    return {
+        "id": f"inc-{f['id']}",
+        "titulo": titulo,
+        "resumen": f.get("descripcion", ""),
+        "url": f.get("fuente_url", ""),
+        "fecha": f["fecha"] + "T12:00:00+00:00",
+        "fecha_precision": f["fecha_precision"],
+        "fuente": f.get("fuente_nombre") or "Incidente (carga manual)",
+        "origen": "incidente_csv",
+        "carril": "ataque",
+        "tipo_actor": f["tipo_actor"],
+        "tecnicas": tecnicas,
+        "grupos": [f["grupo"]] if f.get("grupo") and f["grupo"].lower() != "desconocido" else [],
+        "sector": f.get("sector", ""),
+        "dominio_objetivo": f.get("dominio_objetivo", ""),
+        "motivacion": f.get("motivacion_declarada", ""),
+        "confianza": f.get("confianza", ""),
+        "verificado": f.get("verificado", ""),
+    }
+
+
 def cargar_incidentes() -> list[dict]:
-    eventos = []
-    for f in _leer_csv(ARCHIVO_INCIDENTES):
-        tecnicas = [t.strip() for t in f.get("tecnicas_mitre", "").replace(",", ";").split(";") if t.strip()]
-        titulo = f"{f.get('grupo') or 'Actor desconocido'} → {f.get('objetivo') or f.get('dominio_objetivo') or 'objetivo argentino'}"
-        if f.get("tipo_ataque"):
-            titulo += f" ({f['tipo_ataque']})"
-        eventos.append({
-            "id": f"inc-{f['id']}",
-            "titulo": titulo,
-            "resumen": f.get("descripcion", ""),
-            "url": f.get("fuente_url", ""),
-            "fecha": f["fecha"] + "T12:00:00+00:00",
-            "fuente": f.get("fuente_nombre") or "Incidente (carga manual)",
-            "origen": "incidente_csv",
-            "carril": "ataque",
-            "tecnicas": tecnicas,
-            "grupos": [f["grupo"]] if f.get("grupo") else [],
-            "sector": f.get("sector", ""),
-            "dominio_objetivo": f.get("dominio_objetivo", ""),
-            "motivacion": f.get("motivacion_declarada", ""),
-            "confianza": f.get("confianza", ""),
-            "verificado": f.get("verificado", ""),
-        })
-    return eventos
+    """Incidentes con fecha conocida (día, mes o aproximada): entran al semáforo."""
+    return [_evento_incidente(f) for f in _leer_incidentes() if f["fecha_precision"] != "desconocida"]
+
+
+def cargar_incidentes_sin_fecha() -> list[dict]:
+    """Incidentes con fecha desconocida: se listan, pero NO entran a la línea de tiempo ni al
+    semáforo (una fecha inventada distorsionaría la evaluación)."""
+    return [_evento_incidente(f) for f in _leer_incidentes() if f["fecha_precision"] == "desconocida"]
 
 
 def construir_gdelt_historico(config: dict, reiniciar: bool = False) -> bool:
@@ -92,9 +114,9 @@ def construir_gdelt_historico(config: dict, reiniciar: bool = False) -> bool:
                 [(q, dias_por_tramo["ciber"]) for q in cfg["consultas_ciber"]]
 
     previo = {} if reiniciar else leer_json(ARCHIVO_GDELT_HIST, {})
-    if previo.get("inicio") != inicio.isoformat() or previo.get("fin") != fin.isoformat() \
-            or previo.get("dias_por_tramo") != dias_por_tramo:
-        previo = {}   # cambió el periodo o el tamaño de tramo: se empieza de cero
+    if previo.get("inicio") != inicio.isoformat() or previo.get("dias_por_tramo") != dias_por_tramo:
+        previo = {}   # cambió el inicio o el tamaño de tramo: se empieza de cero
+    # Si solo se extendió la fecha final, se conserva lo descargado y se agregan los tramos nuevos.
     noticias = previo.get("noticias", [])
     hechos = {(t["desde"], t["consulta"]): t for t in previo.get("tramos", []) if "error" not in t}
     vistas = {n["url"] for n in noticias}
@@ -104,7 +126,9 @@ def construir_gdelt_historico(config: dict, reiniciar: bool = False) -> bool:
         d = inicio
         while d <= fin:
             hasta = min(d + timedelta(days=dias), fin + timedelta(days=1))
-            if (d.isoformat(), q) not in hechos:
+            previo_tramo = hechos.get((d.isoformat(), q))
+            if not previo_tramo or previo_tramo["hasta"] != hasta.isoformat():
+                hechos.pop((d.isoformat(), q), None)   # tramo nuevo o que ahora es más largo
                 pendientes.append((d, hasta, q))
             d = hasta
     pendientes.sort(key=lambda p: p[0])   # avanzar en orden cronológico

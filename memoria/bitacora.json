@@ -1,0 +1,176 @@
+{
+  "_ayuda": "Registro cronológico del proyecto. En cada avance se agrega una entrada en 'eventos' (y, si corresponde, una versión nueva en 'versiones') y se regenera la memoria con: node memoria/generar_memoria.js",
+  "versiones": [
+    {
+      "version": "0.1",
+      "fecha": "13/10/2026",
+      "cambios": "Versión inicial: documenta la Fase 1 completa (planificación, desarrollo, puesta en marcha y primeras mediciones)."
+    },
+    {
+      "version": "0.2",
+      "fecha": "13/10/2026",
+      "cambios": "Búsqueda inicial de incidentes del caso de estudio (sección 5.4) con candidatos pendientes de validación por el autor."
+    },
+    {
+      "version": "0.2",
+      "fecha": "14/10/2026",
+      "cambios": "Búsqueda inicial de incidentes candidatos (13) y propuesta metodológica de grupo de comparación (hacktivistas vs. cibercriminales)."
+    },
+    {
+      "version": "0.3",
+      "fecha": "14/10/2026",
+      "cambios": "Carga de los 13 incidentes, columna de tipo de actor, evaluación del modelo con análisis de sensibilidad y extensión del período hasta la actualidad."
+    },
+    {
+      "version": "0.4",
+      "fecha": "14/10/2026",
+      "cambios": "Segunda lista de candidatos (agosto 2024 – hoy): 8 hechos clave y 10 incidentes, pendientes de decisión del autor."
+    }
+  ],
+  "eventos": [
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Planificación",
+      "titulo": "Definición de requisitos y plan de trabajo",
+      "detalle": "El autor planteó la plataforma (fuentes, palabras clave, semáforo, pantalla única, modo histórico, Fase 2 con IA, documentación en español). Se propuso un plan de 9 pasos y el autor lo aprobó antes de empezar."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Problema",
+      "titulo": "El entorno de desarrollo no puede acceder a los feeds",
+      "detalle": "El entorno en la nube donde se escribe el código tiene la salida a internet restringida (HTTP 403 del proxy). Se decidió probar las fuentes desde los servidores de GitHub Actions, que es donde la plataforma funciona realmente."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Problema",
+      "titulo": "Error 403 al subir el código al repositorio",
+      "detalle": "La aplicación de Claude no tenía permiso sobre el repositorio gastonaizama/Tfm. El autor instaló/reconectó la Claude GitHub App y el envío funcionó."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Prueba",
+      "titulo": "Prueba de disponibilidad de fuentes en GitHub Actions",
+      "detalle": "Los 6 feeds RSS respondieron (WeLiveSecurity con la URL /es/rss/feed/). GDELT devolvió artículos de 2023-2024 por rango de fechas (histórico viable), pero con frecuentes rechazos HTTP 429 por límite de uso."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Desarrollo",
+      "titulo": "Primera versión completa de la plataforma",
+      "detalle": "Motor en Python (conectores RSS y GDELT, clasificador por palabras clave, mapeo MITRE ATT&CK, semáforo con ventana configurable, modo histórico), página web de una sola pantalla, workflows de GitHub Actions, 13 pruebas automáticas, README y documento de decisiones técnicas."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Problema",
+      "titulo": "Las verificaciones se cortaban a los 30 minutos",
+      "detalle": "Un mes de histórico de GDELT no terminó en 30 minutos. Medición: una consulta útil cada 20 s a 3,5 min; las consultas geopolíticas llegaban al tope de 250 artículos incluso en tramos de 3 días."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Desarrollo",
+      "titulo": "Rediseño: histórico de GDELT por partes y reanudable",
+      "detalle": "Consultas español/inglés unificadas, orden por relevancia, tramos de 2 días (geo) y 30 días (ciber), progreso guardado, presupuesto de 40 minutos por ejecución y nuevo workflow 'Completar histórico' cada hora."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Prueba",
+      "titulo": "Verificación completa exitosa",
+      "detalle": "Pruebas, histórico (detención controlada ante rechazos) y revisión en vivo correctas. El clasificador detectó un ataque real: 'Un hackeo mundial: el ciberataque a la Asociación del Fútbol Argentino' (WeLiveSecurity)."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Prueba",
+      "titulo": "Diagnóstico de consultas a GDELT",
+      "detalle": "3 de 5 consultas de prueba rechazadas (HTTP 429). Conclusión: en vivo los RSS son la fuente principal y GDELT es complementario; GDELT es más valioso para el análisis histórico (decisión D8b)."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Configuración de GitHub por el autor",
+      "detalle": "GitHub Pages con origen 'GitHub Actions' y permisos de lectura y escritura para los workflows."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Creación de la rama main",
+      "detalle": "Con autorización del autor se creó la rama main y el autor la marcó como rama principal del repositorio."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Problema",
+      "titulo": "La primera publicación de la web fue rechazada",
+      "detalle": "El entorno github-pages solo permitía publicar desde la rama de desarrollo (era la principal cuando se activó Pages). El autor agregó main a las reglas del entorno y la publicación funcionó."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Hito",
+      "titulo": "Plataforma publicada",
+      "detalle": "Primera revisión oficial desde main y publicación en https://gastonaizama.github.io/Tfm/."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Pull Request #1 fusionado",
+      "detalle": "Se incorporó a main la decisión técnica D8b. El autor revisó y fusionó el Pull Request desde la web de GitHub."
+    },
+    {
+      "fecha": "12/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Inicio de la descarga del histórico",
+      "detalle": "Se lanzó manualmente el workflow 'Completar histórico' para no esperar a que GitHub active la programación horaria."
+    },
+    {
+      "fecha": "13/10/2026",
+      "tipo": "Documentación",
+      "titulo": "Creación de esta memoria",
+      "detalle": "Documento Word generado automáticamente desde el repositorio (memoria/generar_memoria.js), con capturas de pantalla, que se actualiza con cada avance del proyecto."
+    },
+    {
+      "fecha": "13/10/2026",
+      "tipo": "Investigación",
+      "titulo": "Búsqueda inicial de incidentes conocidos",
+      "detalle": "Búsqueda web en fuentes abiertas (medios argentinos, sitios de inteligencia de amenazas, informes de empresas de seguridad). Se identificaron 3 candidatos dentro del período (Cyber Dragonz, LulzSec Muslims, REM) y 2 inmediatamente posteriores (agosto 2024). Ninguno fue cargado: quedan pendientes de validación por el autor."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Investigación",
+      "titulo": "Búsqueda inicial de incidentes candidatos",
+      "detalle": "A pedido del autor se buscaron ataques contra el Estado argentino, vinculados o no a conflictos geopolíticos. Se identificaron 13 candidatos (7 hacktivistas pro-Palestina, entre ellos Cyber Dragonz, LulzSec Muslims, REM y Stucx Team, y 6 cibercriminales o de motivación desconocida). Se guardaron en datos/candidatos_incidentes.csv, pendientes de validación por el autor."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Decisión",
+      "titulo": "Grupo de comparación para evaluar la hipótesis",
+      "detalle": "Se propuso incluir también ataques sin motivación geopolítica, etiquetados por tipo de actor, para comparar si los ataques hacktivistas se concentran en las ventanas de vigilancia más que los cibercriminales."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Decisión",
+      "titulo": "Carga de los 13 incidentes candidatos",
+      "detalle": "El autor decidió cargar los 13 candidatos en datos/incidentes_historicos.csv, todos marcados como no verificados. Los 2 sin fecha conocida (REM y Stucx Team) se listan, pero no entran al cálculo."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Desarrollo",
+      "titulo": "Evaluación del modelo por tipo de actor",
+      "detalle": "Nuevas columnas tipo_actor y fecha_precision. Nuevo módulo de evaluación que compara, para ventanas de 3, 7, 14 y 21 días, el porcentaje de ataques dentro de las ventanas con la cobertura esperable por azar. Se muestra en la web en la sección 'Evaluación del modelo'. Total de pruebas automáticas: 15."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Decisión",
+      "titulo": "Extensión del período histórico hasta la actualidad",
+      "detalle": "El período pasa a ser 01/08/2023 – 11/10/2026 (el día anterior al inicio del monitoreo en vivo). El caso de estudio original se conserva como período predefinido. La descarga de GDELT conserva lo ya descargado (44 tramos, ~10.000 artículos) y pasa de 196 a 623 tramos."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Resultado",
+      "titulo": "Primeros resultados preliminares",
+      "detalle": "Con 21 días de ventana, 3 de 5 ataques hacktivistas con fecha caen dentro de ventanas (60 %) frente a una cobertura del 18 % (razón 3,3). Con 7 días ninguno cae dentro. El defacement de argentina.gob.ar (19/10/2023, motivación interna) cae dentro de la ventana posterior al 7 de octubre: ejemplo de falso positivo."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Investigación",
+      "titulo": "Segunda lista de candidatos (agosto 2024 – hoy)",
+      "detalle": "Para el período extendido se identificaron 8 hechos clave (segunda y tercera visita de Milei a Israel, ingreso al Board of Peace, guerra de EE. UU. e Israel contra Irán, expulsión del encargado de negocios iraní, entre otros) y 10 incidentes (entre ellos el intento de DDoS a la Cancillería del 05/02/2026, atribuido a una campaña hacktivista contra los países del Board of Peace). Guardados en datos/candidatos_hechos_clave.csv y datos/candidatos_incidentes.csv, pendientes de decisión."
+    }
+  ]
+}
