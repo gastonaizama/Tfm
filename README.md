@@ -124,7 +124,7 @@ Tfm/
 
 ## 5. Modo histórico y carga manual de incidentes
 
-Los feeds RSS solo muestran las últimas noticias, así que el periodo **agosto 2023 – julio 2024** se arma con tres fuentes:
+Los feeds RSS solo muestran las últimas noticias, así que el período histórico (**agosto 2023 – 11/10/2026**, extendido desde el caso de estudio original ago 2023 – jul 2024) se arma con tres fuentes:
 
 1. **GDELT**: se descarga automáticamente **por partes**. La tarea *Completar histórico* corre cada hora, avanza lo que GDELT permite y guarda el progreso en `datos/gdelt_historico.json`. En total son unas 200 consultas; según cuánto limite GDELT, el histórico tarda entre unas horas y un par de días en completarse. Mientras tanto, la página muestra un aviso.
 2. **`datos/hechos_clave.csv`**: hechos geopolíticos de referencia (7 de octubre de 2023, anuncio del traslado de la embajada, fallo AMIA, etc.). Cada uno abre una ventana por sí solo. ⚠️ Están marcados como `verificado = no`: revisá las fechas y completá la columna `fuente_url`.
@@ -136,7 +136,9 @@ Los feeds RSS solo muestran las últimas noticias, así que el periodo **agosto 
 |---|---|---|
 | `id` | identificador único | `INC-001` |
 | `fecha` | fecha del ataque, formato AAAA-MM-DD | `2024-02-08` |
+| `fecha_precision` | dia / mes / aproximada / desconocida (las desconocidas no entran al cálculo) | `dia` |
 | `grupo` | actor que lo reivindica | `Cyber Dragonz` |
+| `tipo_actor` | hacktivista / cibercriminal / estatal / desconocido (grupo de comparación) | `hacktivista` |
 | `objetivo` | organización atacada | `Municipalidad de X` |
 | `dominio_objetivo` | sitio web afectado | `x.gob.ar` |
 | `sector` | gobierno, salud, educación, finanzas, medios… | `gobierno` |
@@ -147,12 +149,16 @@ Los feeds RSS solo muestran las últimas noticias, así que el periodo **agosto 
 | `fuente_nombre` / `fuente_url` | de dónde sale el dato | medio, Telegram, X… |
 | `confianza` | alta / media / baja | `media` |
 | `verificado` | si / no | `si` |
+| `nota` | observaciones de la revisión | |
 
 **Cómo editarlo sin instalar nada:** en GitHub abrí el archivo, pulsá el ícono del lápiz ✏️, agregá una fila por incidente y pulsá **Commit changes**. La página se actualiza sola en unos minutos. Las filas cuyo `id` empieza con `EJEMPLO` se ignoran.
 
 > Consejo: si usás Excel o Google Sheets, guardá como **CSV UTF-8** para no perder las tildes.
 
 ---
+
+### Evaluación del modelo
+La página incluye una tabla **"Evaluación del modelo"** que responde: *¿los ataques caen dentro de las ventanas de vigilancia más de lo esperable por azar?* Para cada tamaño de ventana (3, 7, 14 y 21 días) y cada tipo de actor muestra cuántos ataques cayeron dentro, la **cobertura** (porcentaje de días cubiertos por ventanas = lo esperable por azar) y la **razón** entre ambos (mayor que 1 = a favor de la hipótesis). Los cibercriminales funcionan como grupo de comparación.
 
 ## 6. Cómo replicar la plataforma (sin instalar nada)
 

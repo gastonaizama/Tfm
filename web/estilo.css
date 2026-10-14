@@ -142,3 +142,8 @@ footer { color: var(--texto-3); font-size: .82rem; padding-bottom: 30px; }
   .luz { width: 26px; height: 26px; }
   .nivel { font-size: 1.5rem; }
 }
+
+.presets { display: inline-flex; flex-wrap: wrap; gap: 8px; }
+tr.actual td { background: var(--banda-a); }
+#evaluacion td, #evaluacion th { text-align: center; }
+#evaluacion td:first-child, #evaluacion th:first-child { text-align: left; }

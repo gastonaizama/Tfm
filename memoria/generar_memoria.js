@@ -332,7 +332,8 @@ add(
   V("**Semáforo:** nivel actual (o el nivel en la fecha final del rango, en modo histórico) y resumen del período: cantidad de hechos, ataques, días en amarillo y en rojo, y nivel máximo."),
   V("**Línea de tiempo:** carril superior con hechos geopolíticos (barras por día) y carril inferior con ataques. Los rombos marcan datos cargados a mano; las bandas sombreadas son las ventanas de vigilancia; la franja central muestra el nivel de cada día. Al pasar el mouse por un día se ve un resumen, y con un clic se ven todas sus noticias."),
   V("**Alertas:** lista con nivel, fechas, noticias relacionadas, grupos detectados y técnicas MITRE, con enlaces a la fuente y a ATT&CK. Un interruptor muestra u oculta las alertas informativas."),
-  V("**Selector de fechas:** permite pasar del modo en vivo al histórico; el botón «Caso de estudio» carga agosto 2023 – julio 2024."),
+  V("**Selector de fechas:** permite pasar del modo en vivo al histórico; dos botones cargan el caso de estudio (ago 2023 – jul 2024) y el período completo (ago 2023 – hoy)."),
+  V("**Evaluación del modelo:** tabla por tipo de actor y tamaño de ventana (capítulo 15)."),
   V("**Tabla de eventos** (accesible) y **estado de las fuentes y metodología**."),
   ...figura("web_historico.png", "Modo histórico del caso de estudio con los 8 hechos clave. Todavía sin ataques cargados: 6 alertas amarillas y ninguna roja.", 520),
   ...figura("web_alertas_info.png", "Alerta informativa real detectada automáticamente: el ciberataque a la Asociación del Fútbol Argentino (fuente: WeLiveSecurity)."),
@@ -368,7 +369,7 @@ add(
 add(
   H1("10. Pruebas y verificación"),
   H2("10.1. Pruebas automáticas"),
-  P("El archivo `tests/test_reglas.py` contiene 13 pruebas que se ejecutan antes de cada revisión. Si alguna falla, la revisión se detiene y la web publicada no cambia."),
+  P("El archivo `tests/test_reglas.py` contiene 15 pruebas que se ejecutan antes de cada revisión. Si alguna falla, la revisión se detiene y la web publicada no cambia."),
   tabla(["Prueba", "Qué comprueba"], [
     ["Hecho geopolítico", "«embajada argentina a Jerusalén» se clasifica como geopolítico"],
     ["Geo débil", "«Argentina votó en la ONU…» (1 punto) se descarta"],
@@ -383,6 +384,8 @@ add(
     ["Hecho clave", "Un hecho clave abre la ventana por sí solo"],
     ["Fusión de ventanas", "Detonantes cercanos forman un único período"],
     ["Ventana configurable", "Con 3 días, la ventana se cierra antes"],
+    ["Evaluación", "Cálculo de cobertura, razón y anticipación por tipo de actor"],
+    ["Incidentes sin fecha", "No entran al cálculo ni a la línea de tiempo"],
   ], [2600, 7038]),
   H2("10.2. Verificaciones con datos reales"),
   tabla(["Ejecución", "Resultado", "Observación"], [
@@ -433,6 +436,9 @@ add(
     ["D18–D20", "Ventanas fusionables, rojo persistente, alertas informativas", "Coherencia operativa y evaluación del modelo"],
     ["D21–D24", "Horarios, workflows separados, pruebas, secretos", "Calidad y seguridad"],
     ["D25", "Diseño de la Fase 2 (Haiku clasifica, Sonnet informa)", "Comparar IA con reglas y controlar el costo"],
+    ["D26", "Grupo de comparación por tipo de actor", "Evitar sesgo de confirmación"],
+    ["D27", "Incidentes sin fecha fuera del cálculo", "No distorsionar la evaluación"],
+    ["D28", "Período extendido hasta la actualidad", "Incluir la ola de ataques de agosto de 2024"],
   ], [1100, 4600, 3938]),
 );
 
@@ -444,10 +450,11 @@ add(
   V("Revisión automática cada 6 horas; histórico de GDELT descargándose por partes."),
   V("Fase 2 preparada (carpeta `monitor/ia/`, interruptor en la configuración y lugar para el secreto), sin implementar."),
   H2("13.2. Tareas pendientes del autor"),
-  N("**Cargar los ataques conocidos** del período en `datos/incidentes_historicos.csv`. Sin ellos, el modo histórico no puede mostrar alertas rojas ni evaluar la hipótesis.", "numeros5"),
+  N("**Cargar los ataques conocidos**: **hecho el 14/10/2026** (13 incidentes en `datos/incidentes_historicos.csv`). Queda ampliarlo para el período extendido.", "numeros5"),
   N("**Verificar los 8 hechos clave:** confirmar fechas, completar `fuente_url` y marcar `verificado = si`.", "numeros5"),
   N("Completar el nombre del autor en la portada de esta memoria.", "numeros5"),
-  N("**Revisar los 13 incidentes candidatos** de `datos/candidatos_incidentes.csv` (capítulo 14) y decidir cuáles se cargan.", "numeros5"),
+  N("**Verificar los 13 incidentes cargados** (capítulo 14) y averiguar las fechas de REM y Stucx Team.", "numeros5"),
+  N("Agregar hechos clave e incidentes posteriores a julio de 2024, ya que el período se extendió hasta la actualidad.", "numeros5"),
   H2("13.3. Próximos pasos propuestos"),
   V("**Evaluación del modelo:** proporción de ataques ocurridos dentro de ventanas de vigilancia, días de anticipación entre detonante y ataque, y alertas sin ataques posteriores."),
   V("**Análisis de sensibilidad:** comparar ventanas de 3, 7 y 14 días y distintos umbrales."),
@@ -472,8 +479,8 @@ add(
   P("A pedido del autor, la búsqueda incluyó ataques contra el Estado argentino **vinculados o no** a conflictos geopolíticos. Esto no le quita sentido al análisis de contexto; lo fortalece: los ataques sin motivación geopolítica (por ejemplo, ransomware con fines económicos) funcionan como **grupo de comparación**."),
   nota("**Pregunta de evaluación:** ¿los ataques **hacktivistas** caen dentro de las ventanas de vigilancia con más frecuencia que los ataques **cibercriminales**? Si es así, el contexto geopolítico anticipa el hacktivismo. Si ambos caen por igual, el semáforo solo reflejaría que hay ataques todo el tiempo."),
   P("Para ello se propone etiquetar cada incidente con su **tipo de actor** (hacktivista, cibercriminal, estatal o desconocido)."),
-  H2("14.3. Candidatos encontrados (pendientes de validación)"),
-  P(`La búsqueda inicial (14/10/2026) identificó ${candidatos.length} candidatos, guardados en \`datos/candidatos_incidentes.csv\`. **Ninguno se dio por verificado**: el autor debe revisar cada uno antes de pasarlo al archivo de incidentes. Varias fuentes son secundarias o recogen reivindicaciones de los propios grupos.`),
+  H2("14.3. Incidentes cargados"),
+  P(`La búsqueda inicial (14/10/2026) identificó ${candidatos.length} candidatos (\`datos/candidatos_incidentes.csv\`). El autor decidió **cargarlos todos** en \`datos/incidentes_historicos.csv\`, marcados como **no verificados**. Varias fuentes son secundarias o recogen reivindicaciones de los propios grupos, por lo que la verificación sigue pendiente. Los dos incidentes **sin fecha conocida** (REM y Stucx Team) se muestran en la página, pero no entran al cálculo.`),
   tabla(["Fecha", "Actor", "Tipo", "Objetivo", "Ataque", "Confianza"],
     candidatos.map((c) => [fechaCand(c), c.grupo, c.tipo_actor, c.objetivo, c.tipo_ataque, c.confianza]),
     [1200, 1500, 1350, 3188, 1250, 1150]),
@@ -482,6 +489,34 @@ add(
   V("La reivindicación de **LulzSec Muslims** contra datos de las Fuerzas Armadas (aprox. 22/02/2024) ocurre **16 días** después de la visita a Israel (06/02/2024): queda **fuera** de una ventana de 7 días, pero **dentro** de una de 14 o 21. Es un caso útil para el análisis de sensibilidad de la ventana."),
   V("Varios ataques de LulzSec Muslims se concentran en **agosto de 2024**, poco después de la declaración de Hamás como organización terrorista (12/07/2024) y del 30.º aniversario de la AMIA (18/07/2024). Conviene evaluar si se extiende el período de estudio hasta agosto de 2024."),
   V("El ataque al Gobierno de Río Negro (05/02/2024) ocurre un día antes de la visita a Israel, sin relación aparente: ejemplo de **coincidencia temporal sin causalidad**, importante para la discusión de resultados."),
+);
+
+// 15. Evaluación y extensión del período
+const datosWeb = JSON.parse(fs.readFileSync(path.join(RAIZ, "web", "datos.json"), "utf8"));
+const ev = datosWeb.evaluacion;
+const celdaEv = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n} (${x.pct_dentro} %)` + (x.razon !== null ? `\nrazón ${x.razon}` : "");
+add(
+  H1("15. Evaluación del modelo"),
+  H2("15.1. Método"),
+  P("Para cada tamaño de ventana y cada tipo de actor se calcula cuántos ataques ocurrieron **dentro** de una ventana de vigilancia. Ese porcentaje se compara con la **cobertura**, es decir, el porcentaje de días del período cubiertos por ventanas: es lo que se esperaría si los ataques ocurrieran al azar. La **razón** entre ambos resume el resultado:"),
+  V("**Razón mayor que 1:** ese tipo de actor ataca dentro de las ventanas más de lo esperable por azar (evidencia a favor de la hipótesis)."),
+  V("**Razón cercana a 1:** no hay relación con los hechos detonantes. Es lo esperado para el grupo de comparación (cibercriminales)."),
+  P("Se evalúan ventanas de 3, 7, 14 y 21 días (**análisis de sensibilidad**). La de 7 días es la que usa el semáforo."),
+  H2("15.2. Resultados preliminares"),
+  P(`Período evaluado: ${ev.inicio} a ${ev.fin} (${ev.dias} días, ${ev.detonantes} días detonantes). Datos al ${datosWeb.generado.slice(0, 10)}.`),
+  tabla(["Ventana", "Cobertura", "Hacktivista", "Cibercriminal", "Desconocido"],
+    ev.ventanas.map((v) => [`${v.ventana_dias} días`, `${v.cobertura_pct} %`, celdaEv(v.grupos.hacktivista), celdaEv(v.grupos.cibercriminal), celdaEv(v.grupos.desconocido)]),
+    [1500, 1500, 2300, 2169, 2169]),
+  espacio(),
+  ...figura("web_evaluacion.png", "Sección «Evaluación del modelo» en la página, con los incidentes sin fecha al pie."),
+  H2("15.3. Lectura de los resultados"),
+  V("Con la ventana de **7 días** ningún ataque hacktivista cae dentro; con **21 días**, 3 de 5 (razón superior a 3). Esto sugiere que, si existe relación, el hacktivismo **no reacciona en una semana**, sino en dos o tres. Es una hipótesis a confirmar con más datos."),
+  V("El defacement de argentina.gob.ar (19/10/2023), de motivación política interna, cae dentro de la ventana abierta tras el 7 de octubre de 2023 y pone el semáforo en rojo: es un **falso positivo** que muestra el límite de un modelo basado solo en fechas."),
+  nota("**Advertencia:** son muy pocos incidentes y casi todos sin verificar. Estos números ilustran el **método**; no permiten conclusiones. Al completarse el histórico de GDELT y verificarse los incidentes, la tabla se recalcula sola."),
+  H2("15.4. Extensión del período hasta la actualidad"),
+  P("A pedido del autor, el período histórico se extendió a **01/08/2023 – 11/10/2026** (el día anterior al inicio del monitoreo en vivo). El caso de estudio original se mantiene como período predefinido en la página. La descarga de GDELT conserva lo ya obtenido y pasa de 196 a 623 tramos, por lo que tardará varios días más en completarse."),
+  ...figura("web_periodo_completo.png", "Vista del período completo (agosto 2023 – hoy) con los incidentes cargados y la descarga de GDELT todavía en curso."),
+  ...figura("web_linea_caso.png", "Línea de tiempo del caso de estudio (ago 2023 – jul 2024): ventanas amarillas, períodos en rojo e incidentes cargados (rombos)."),
 );
 
 // Anexo A: bitácora

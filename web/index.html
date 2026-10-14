@@ -24,7 +24,7 @@
     </div>
     <label>Desde <input type="date" id="desde"></label>
     <label>Hasta <input type="date" id="hasta"></label>
-    <button type="button" id="btn-caso" class="secundario">Caso de estudio (ago 2023 – jul 2024)</button>
+    <span id="presets" class="presets"></span>
   </section>
 
   <main>
@@ -64,6 +64,12 @@
           <label class="interruptor"><input type="checkbox" id="ver-info"> Ver informativas (ataques sin detonante)</label></span>
       </div>
       <ol id="alertas" class="alertas"></ol>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-titulo"><h2>Evaluación del modelo</h2><span class="contador">¿Los ataques caen dentro de las ventanas de vigilancia?</span></div>
+      <div id="evaluacion"></div>
+      <div id="sin-fecha" class="detalle-dia" hidden></div>
     </section>
 
     <section class="tarjeta" id="informe-ia" hidden>

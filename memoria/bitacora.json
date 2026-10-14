@@ -15,6 +15,11 @@
       "version": "0.2",
       "fecha": "14/10/2026",
       "cambios": "Búsqueda inicial de incidentes candidatos (13) y propuesta metodológica de grupo de comparación (hacktivistas vs. cibercriminales)."
+    },
+    {
+      "version": "0.3",
+      "fecha": "14/10/2026",
+      "cambios": "Carga de los 13 incidentes, columna de tipo de actor, evaluación del modelo con análisis de sensibilidad y extensión del período hasta la actualidad."
     }
   ],
   "eventos": [
@@ -131,6 +136,30 @@
       "tipo": "Decisión",
       "titulo": "Grupo de comparación para evaluar la hipótesis",
       "detalle": "Se propuso incluir también ataques sin motivación geopolítica, etiquetados por tipo de actor, para comparar si los ataques hacktivistas se concentran en las ventanas de vigilancia más que los cibercriminales."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Decisión",
+      "titulo": "Carga de los 13 incidentes candidatos",
+      "detalle": "El autor decidió cargar los 13 candidatos en datos/incidentes_historicos.csv, todos marcados como no verificados. Los 2 sin fecha conocida (REM y Stucx Team) se listan, pero no entran al cálculo."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Desarrollo",
+      "titulo": "Evaluación del modelo por tipo de actor",
+      "detalle": "Nuevas columnas tipo_actor y fecha_precision. Nuevo módulo de evaluación que compara, para ventanas de 3, 7, 14 y 21 días, el porcentaje de ataques dentro de las ventanas con la cobertura esperable por azar. Se muestra en la web en la sección 'Evaluación del modelo'. Total de pruebas automáticas: 15."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Decisión",
+      "titulo": "Extensión del período histórico hasta la actualidad",
+      "detalle": "El período pasa a ser 01/08/2023 – 11/10/2026 (el día anterior al inicio del monitoreo en vivo). El caso de estudio original se conserva como período predefinido. La descarga de GDELT conserva lo ya descargado (44 tramos, ~10.000 artículos) y pasa de 196 a 623 tramos."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Resultado",
+      "titulo": "Primeros resultados preliminares",
+      "detalle": "Con 21 días de ventana, 3 de 5 ataques hacktivistas con fecha caen dentro de ventanas (60 %) frente a una cobertura del 18 % (razón 3,3). Con 7 días ninguno cae dentro. El defacement de argentina.gob.ar (19/10/2023, motivación interna) cae dentro de la ventana posterior al 7 de octubre: ejemplo de falso positivo."
     }
   ]
 }
