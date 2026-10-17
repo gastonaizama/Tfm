@@ -537,7 +537,7 @@ add(
     ["F — No se puede juzgar", "6 — No se puede juzgar"],
   ], [4819, 4819]),
   espacio(),
-  P("La planilla ordena los incidentes por prioridad: primero los hacktivistas y los de fecha desconocida, porque son los que más influyen en la evaluación del modelo."),
+  P("La planilla ordena los incidentes del más reciente al más antiguo (los de fecha desconocida, al final) e indica una prioridad: los hacktivistas y los de fecha desconocida son los que más influyen en la evaluación del modelo."),
 );
 
 // 15. Evaluación y extensión del período

@@ -217,6 +217,12 @@
       "tipo": "Documentación",
       "titulo": "Planilla de verificación",
       "detalle": "Se generó datos/verificacion/planilla_verificacion.xlsx con los 23 incidentes (ordenados por prioridad) y los 16 hechos clave, columnas a completar con listas desplegables y un resumen de avance automático."
+    },
+    {
+      "fecha": "17/10/2026",
+      "tipo": "Documentación",
+      "titulo": "Planilla ordenada por fecha",
+      "detalle": "A pedido del autor, los incidentes de la planilla de verificación se ordenaron del más reciente al más antiguo (los de fecha desconocida, al final). La columna de prioridad se mantiene para filtrar."
     }
   ]
 }
