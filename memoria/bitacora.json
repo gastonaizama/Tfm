@@ -30,6 +30,11 @@
       "version": "0.5",
       "fecha": "14/10/2026",
       "cambios": "Carga de la segunda lista (8 hechos clave y 10 incidentes) y evaluación con filtro por confianza (análisis de robustez)."
+    },
+    {
+      "version": "0.6",
+      "fecha": "17/10/2026",
+      "cambios": "Metodología de verificación (Código Almirantazgo, corroboración y evidencia técnica) y planilla de verificación para el autor."
     }
   ],
   "eventos": [
@@ -194,6 +199,24 @@
       "tipo": "Resultado",
       "titulo": "Resultados con 23 incidentes y 16 hechos clave",
       "detalle": "Con ventana de 21 días, los hacktivistas tienen una razón de 1,92 (todos los incidentes) y 1,68 (solo confianza media/alta), frente a 0,75 y 0,84 de los cibercriminales. Con 7 días, ningún ataque hacktivista cae dentro de las ventanas. El patrón se mantiene en ambas variantes."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Pull Request #3 fusionado",
+      "detalle": "El autor fusionó el PR con la segunda lista (23 incidentes y 16 hechos clave en total) y la evaluación con filtro por confianza."
+    },
+    {
+      "fecha": "17/10/2026",
+      "tipo": "Metodología",
+      "titulo": "Método de verificación de los datos",
+      "detalle": "Se definió cómo verificar cada incidente y hecho clave: comprobar la fuente y la fecha real del hecho, corroborar con una fuente independiente, buscar evidencia técnica (Wayback Machine, Zone-H, ransomware.live) y calificar con el Código Almirantazgo (fiabilidad A–F y credibilidad 1–6). Decisión final: confirmado, reivindicado sin confirmar o descartado."
+    },
+    {
+      "fecha": "17/10/2026",
+      "tipo": "Documentación",
+      "titulo": "Planilla de verificación",
+      "detalle": "Se generó datos/verificacion/planilla_verificacion.xlsx con los 23 incidentes (ordenados por prioridad) y los 16 hechos clave, columnas a completar con listas desplegables y un resumen de avance automático."
     }
   ]
 }

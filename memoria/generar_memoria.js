@@ -455,7 +455,7 @@ add(
   N("**Cargar los ataques conocidos**: **hecho el 14/10/2026** (13 incidentes en `datos/incidentes_historicos.csv`). Queda ampliarlo para el período extendido.", "numeros5"),
   N("**Verificar los 8 hechos clave:** confirmar fechas, completar `fuente_url` y marcar `verificado = si`.", "numeros5"),
   N("Completar el nombre del autor en la portada de esta memoria.", "numeros5"),
-  N("**Verificar los 23 incidentes y los 16 hechos clave cargados** (capítulo 14) y averiguar las fechas de REM y Stucx Team.", "numeros5"),
+  N("**Verificar los 23 incidentes y los 16 hechos clave cargados** con la planilla de verificación (sección 14.6) y averiguar las fechas de REM y Stucx Team.", "numeros5"),
   H2("13.3. Próximos pasos propuestos"),
   V("**Evaluación del modelo:** proporción de ataques ocurridos dentro de ventanas de vigilancia, días de anticipación entre detonante y ataque, y alertas sin ataques posteriores."),
   V("**Análisis de sensibilidad:** comparar ventanas de 3, 7 y 14 días y distintos umbrales."),
@@ -515,6 +515,29 @@ add(
   espacio(),
   V("El **intento de DDoS contra la Cancillería (05/02/2026)** es el caso más claro de la segunda lista: la propia SIDE lo atribuyó a una campaña hacktivista contra los países del Board of Peace, y ocurre **19 días** después del anuncio de ingreso de Argentina (17/01/2026). Vuelve a quedar fuera de una ventana de 7 días y dentro de una de 21."),
   V("Varios incidentes de la segunda lista son **reivindicaciones de grupos de ransomware** recogidas por agregadores (ransomware.live, SOCRadar), sin confirmación oficial: deben tratarse con confianza baja."),
+);
+
+// 14.6 Metodología de verificación
+add(
+  H2("14.6. Metodología de verificación"),
+  P("Todos los incidentes y hechos clave se cargaron como **no verificados**. La verificación la realiza el autor con un método estándar de inteligencia, apoyado en una planilla (\`datos/verificacion/planilla_verificacion.xlsx\`):"),
+  N("**Fuente:** comprobar que la fuente existe y describe ese hecho.", "numeros6"),
+  N("**Fecha real:** distinguir la fecha del hecho de la fecha de publicación de la nota.", "numeros6"),
+  N("**Actor y objetivo:** confirmar quién atacó y a quién.", "numeros6"),
+  N("**Corroboración:** buscar al menos una segunda fuente independiente (que no copie a la primera).", "numeros6"),
+  N("**Evidencia técnica:** Wayback Machine o Zone-H para defacements, ransomware.live para ransomware y filtraciones, comunicados oficiales para DDoS.", "numeros6"),
+  N("**Calificación con el Código Almirantazgo (OTAN):** una letra para la fiabilidad de la fuente (A totalmente fiable … F no se puede juzgar) y un número para la credibilidad de la información (1 confirmada … 6 no se puede juzgar).", "numeros6"),
+  N("**Decisión:** confirmado, reivindicado sin confirmar o descartado.", "numeros6"),
+  tabla(["Fiabilidad de la fuente", "Credibilidad de la información"], [
+    ["A — Totalmente fiable (organismo oficial, el afectado)", "1 — Confirmada por fuentes independientes"],
+    ["B — Normalmente fiable (medio serio, empresa de seguridad)", "2 — Probablemente cierta"],
+    ["C — Bastante fiable (medio menor, investigador)", "3 — Posiblemente cierta"],
+    ["D — No siempre fiable (blog, agregador, redes)", "4 — Dudosa"],
+    ["E — Poco fiable (el propio atacante)", "5 — Improbable"],
+    ["F — No se puede juzgar", "6 — No se puede juzgar"],
+  ], [4819, 4819]),
+  espacio(),
+  P("La planilla ordena los incidentes por prioridad: primero los hacktivistas y los de fecha desconocida, porque son los que más influyen en la evaluación del modelo."),
 );
 
 // 15. Evaluación y extensión del período
@@ -612,7 +635,7 @@ const doc = new Document({
   numbering: {
     config: [
       { reference: "vinetas", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-      ...["numeros", "numeros2", "numeros3", "numeros4", "numeros5"].map((ref) => ({
+      ...["numeros", "numeros2", "numeros3", "numeros4", "numeros5", "numeros6"].map((ref) => ({
         reference: ref, levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }],
       })),
     ],
