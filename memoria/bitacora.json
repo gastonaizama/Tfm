@@ -40,6 +40,11 @@
       "version": "0.7",
       "fecha": "18/10/2026",
       "cambios": "Primeros 10 incidentes verificados por el autor (Código Almirantazgo), variante de evaluación 'solo verificados' y depuración de noticias duplicadas."
+    },
+    {
+      "version": "0.8",
+      "fecha": "18/10/2026",
+      "cambios": "Verificación de los incidentes hacktivistas: 4 verificados (fiabilidad D) y 2 descartados; resultados con la variante 'solo verificados'."
     }
   ],
   "eventos": [
@@ -246,6 +251,24 @@
       "tipo": "Resultado",
       "titulo": "Resultados actualizados con más histórico de GDELT",
       "detalle": "Con 127 tramos descargados (unos 28.000 artículos) los eventos geopolíticos pasaron de 199 a 691 y la cobertura de las ventanas aumentó. Con 21 días: hacktivistas razón 1,57 y cibercriminales 0,92 (todos); 1,38 para ambos (confianza media/alta); en 'solo verificados' hay un único incidente hacktivista, insuficiente para concluir (D32)."
+    },
+    {
+      "fecha": "18/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Pull Request #4 fusionado",
+      "detalle": "El autor fusionó el PR con los primeros 10 incidentes verificados y la variante 'solo verificados'."
+    },
+    {
+      "fecha": "18/10/2026",
+      "tipo": "Verificación",
+      "titulo": "Verificación de incidentes hacktivistas",
+      "detalle": "INC-002, INC-004 e INC-005: D3; INC-006: D2. INC-001 (Cyber Dragonz) e INC-003 (REM) descartados por no guardar relación con el Estado argentino (D33). Queda pendiente INC-022 (AFA)."
+    },
+    {
+      "fecha": "18/10/2026",
+      "tipo": "Resultado",
+      "titulo": "Resultados con incidentes verificados",
+      "detalle": "Solo verificados, ventana de 21 días: hacktivistas 4 de 5 dentro de ventanas (razón 2,20) frente a cibercriminales 1 de 6 (razón 0,46). Con 14 días: 1,23 frente a 0,51. Cuatro de los cinco hacktivistas verificados tienen fuentes de fiabilidad D: resultado indicativo, no concluyente."
     }
   ]
 }

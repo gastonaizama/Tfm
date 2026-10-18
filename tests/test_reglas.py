@@ -138,3 +138,12 @@ class TestDeduplicacion(unittest.TestCase):
                ev("n3", "2024-04-18", "ataque", "A")]
         r = evaluacion.evaluar(evs, SEM, [7], "2024-04-01", "2024-04-30")
         self.assertEqual(r["ventanas"][0]["grupos"]["detectado_automaticamente"]["n"], 2)
+
+
+class TestDescartados(unittest.TestCase):
+    def test_descartados_fuera_del_calculo(self):
+        from monitor import historico
+        ids = {e["id"] for e in historico.cargar_incidentes() + historico.cargar_incidentes_sin_fecha()}
+        for e in historico.cargar_incidentes_descartados():
+            self.assertNotIn(e["id"], ids)
+            self.assertEqual(e["decision"], "descartado")

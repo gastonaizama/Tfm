@@ -369,7 +369,7 @@ add(
 add(
   H1("10. Pruebas y verificación"),
   H2("10.1. Pruebas automáticas"),
-  P("El archivo `tests/test_reglas.py` contiene 18 pruebas que se ejecutan antes de cada revisión. Si alguna falla, la revisión se detiene y la web publicada no cambia."),
+  P("El archivo `tests/test_reglas.py` contiene 19 pruebas que se ejecutan antes de cada revisión. Si alguna falla, la revisión se detiene y la web publicada no cambia."),
   tabla(["Prueba", "Qué comprueba"], [
     ["Hecho geopolítico", "«embajada argentina a Jerusalén» se clasifica como geopolítico"],
     ["Geo débil", "«Argentina votó en la ONU…» (1 punto) se descarta"],
@@ -444,6 +444,7 @@ add(
     ["D30", "Verificación del autor y confianza derivada del código", "El análisis del autor reemplaza la estimación inicial"],
     ["D31", "Un evento por día en noticias detectadas", "Evitar contar varias veces el mismo ataque"],
     ["D32", "Resultados que cambian con el histórico", "Interpretación prudente y recalibración"],
+    ["D33", "Incidentes descartados con motivo, fuera del cálculo", "Trazabilidad del análisis"],
   ], [1100, 4600, 3938]),
 );
 
@@ -458,7 +459,7 @@ add(
   N("**Cargar los ataques conocidos**: **hecho el 14/10/2026** (13 incidentes en `datos/incidentes_historicos.csv`). Queda ampliarlo para el período extendido.", "numeros5"),
   N("**Verificar los 8 hechos clave:** confirmar fechas, completar `fuente_url` y marcar `verificado = si`.", "numeros5"),
   N("Completar el nombre del autor en la portada de esta memoria.", "numeros5"),
-  N("**Completar la verificación:** quedan 13 incidentes (entre ellos 6 de los 7 hacktivistas) y los 16 hechos clave (sección 14.6). Averiguar las fechas de REM y Stucx Team.", "numeros5"),
+  N("**Completar la verificación:** quedan 7 incidentes (entre ellos INC-022, AFA, e INC-013, Stucx Team, sin fecha) y los 16 hechos clave (sección 14.6).", "numeros5"),
   H2("13.3. Próximos pasos propuestos"),
   V("**Evaluación del modelo:** proporción de ataques ocurridos dentro de ventanas de vigilancia, días de anticipación entre detonante y ataque, y alertas sin ataques posteriores."),
   V("**Análisis de sensibilidad:** comparar ventanas de 3, 7 y 14 días y distintos umbrales."),
@@ -571,11 +572,13 @@ add(
   P("Los resultados **cambian a medida que se completa el histórico de GDELT** (decisión D32). Conviene leerlos como una foto de cada momento:"),
   tabla(["Fecha", "Datos", "Hacktivistas (21 días)", "Cibercriminales (21 días)"], [
     ["14/10/2026", "~199 eventos geopolíticos; 23 incidentes", "razón 1,92 (todos) · 1,68 (media/alta)", "razón 0,75 · 0,84"],
-    ["18/10/2026", "~691 eventos geopolíticos; 10 incidentes verificados", "razón 1,57 (todos) · 1,38 (media/alta)", "razón 0,92 · 1,38"],
+    ["18/10/2026 (mañana)", "~691 eventos geopolíticos; 10 incidentes verificados", "razón 1,57 (todos) · 1,38 (media/alta)", "razón 0,92 · 1,38"],
+    ["18/10/2026 (tarde)", "16 verificados, 2 descartados", "razón 1,83 (todos) · 2,20 (solo verificados)", "razón 0,92 · 0,46"],
   ], [1400, 3000, 2700, 2538]),
   espacio(),
   V("Con más noticias detonantes, las ventanas cubren más días (con 21 días, cerca del 36 % del período). Así la ventaja de los hacktivistas se achica y, con confianza media o alta, se iguala a la de los cibercriminales. **La hipótesis no puede confirmarse con los datos actuales.**"),
-  V("Con solo los incidentes **verificados** hay un único ataque hacktivista (Cancillería, 05/02/2026): cae dentro de la ventana de 21 días, pero un caso no permite conclusiones."),
+  V("Con solo los incidentes **verificados** (16, tras descartar 2), los hacktivistas caen dentro de las ventanas de 21 días en 4 de 5 casos (razón 2,20), frente a 1 de 6 de los cibercriminales (razón 0,46). Es la diferencia más clara obtenida hasta ahora."),
+  V("**Pero** 4 de esos 5 hacktivistas se apoyan en fuentes de fiabilidad **D** (no siempre fiable): por eso, con la variante de confianza media o alta casi no quedan hacktivistas para comparar. El resultado es **indicativo, no concluyente**, y muestra la limitación central del tema: hay pocas fuentes fiables sobre hacktivismo, que se anuncia sobre todo en Telegram y X (decisión D33)."),
   V("Dos casos siguen ilustrando una posible reacción a las **dos o tres semanas**: LulzSec Muslims (16 días después de la visita a Israel de 2024) y el intento de DDoS a la Cancillería (19 días después del ingreso al Board of Peace)."),
   V("Si la cobertura sigue creciendo al completarse el histórico, habrá que **recalibrar el umbral de detonante** (por ejemplo, exigir 3 fuentes distintas por día) para que las ventanas sigan siendo selectivas."),
   V("**Falsos positivos observados:** el defacement de argentina.gob.ar (19/10/2023), de motivación interna, dentro de la ventana posterior al 7 de octubre; y una noticia sobre la detención de personas que amenazaron con bombas, clasificada como ataque por las palabras clave."),

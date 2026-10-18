@@ -76,18 +76,32 @@ def _evento_incidente(f: dict) -> dict:
         "confianza": f.get("confianza", ""),
         "verificado": f.get("verificado", ""),
         "codigo_almirantazgo": f.get("codigo_almirantazgo", ""),
+        "decision": f.get("decision", ""),
+        "motivo_decision": f.get("motivo_decision", ""),
     }
 
 
+def _descartado(f: dict) -> bool:
+    return (f.get("decision") or "").lower() == "descartado"
+
+
 def cargar_incidentes() -> list[dict]:
-    """Incidentes con fecha conocida (día, mes o aproximada): entran al semáforo."""
-    return [_evento_incidente(f) for f in _leer_incidentes() if f["fecha_precision"] != "desconocida"]
+    """Incidentes con fecha conocida y no descartados: entran al semáforo."""
+    return [_evento_incidente(f) for f in _leer_incidentes()
+            if f["fecha_precision"] != "desconocida" and not _descartado(f)]
 
 
 def cargar_incidentes_sin_fecha() -> list[dict]:
-    """Incidentes con fecha desconocida: se listan, pero NO entran a la línea de tiempo ni al
-    semáforo (una fecha inventada distorsionaría la evaluación)."""
-    return [_evento_incidente(f) for f in _leer_incidentes() if f["fecha_precision"] == "desconocida"]
+    """Incidentes con fecha desconocida (no descartados): se listan, pero NO entran a la línea
+    de tiempo ni al semáforo (una fecha inventada distorsionaría la evaluación)."""
+    return [_evento_incidente(f) for f in _leer_incidentes()
+            if f["fecha_precision"] == "desconocida" and not _descartado(f)]
+
+
+def cargar_incidentes_descartados() -> list[dict]:
+    """Incidentes que el analista descartó al verificarlos: se conservan con su motivo
+    (trazabilidad), pero no entran a ningún cálculo."""
+    return [_evento_incidente(f) for f in _leer_incidentes() if _descartado(f)]
 
 
 def construir_gdelt_historico(config: dict, reiniciar: bool = False) -> bool:
