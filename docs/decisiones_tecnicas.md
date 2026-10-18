@@ -190,6 +190,11 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
 ### D32. Los resultados cambian a medida que se completa el histórico
 - Con más noticias de GDELT hay más días detonantes y las ventanas cubren más días (con 21 días, la cobertura pasó de cerca del 30 % a cerca del 36 %). Las razones se recalculan solas y no deben citarse como definitivas hasta que el histórico esté completo. Si la cobertura sigue creciendo, habrá que **recalibrar el umbral de detonante** (por ejemplo, exigir 3 fuentes por día) para que las ventanas sigan siendo selectivas.
 
+### D33. Incidentes descartados por el analista
+- **Contexto:** al verificar, el autor determinó que INC-001 (Cyber Dragonz, Biblioteca del Congreso) , INC-003 (REM, credenciales de la AMIA y milei.com.ar) e INC-022 (hackers de origen egipcio contra la AFA) **no guardan relación con el Estado argentino**, que es el objeto del estudio.
+- **Decisión:** se marcan `decision = descartado` con su motivo. No se borran: se listan en la página con el motivo (trazabilidad), pero no entran a la línea de tiempo, al semáforo ni a la evaluación.
+- **Observación metodológica:** 4 de los 5 hacktivistas verificados tienen fuentes de fiabilidad **D** (no siempre fiable). La variante "solo verificados" muestra la mayor diferencia entre hacktivistas y cibercriminales, pero se apoya en fuentes débiles. La variante "confianza media o alta" casi no conserva hacktivistas. Para la discusión, el resultado es **indicativo, no concluyente**, y la limitación principal es la escasez de fuentes fiables sobre hacktivismo (que se anuncia sobre todo en Telegram y X).
+
 ## F. Fase 2 (diseño previsto)
 
 ### D25. Modelos y contrato de datos de la IA

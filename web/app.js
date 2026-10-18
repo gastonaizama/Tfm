@@ -301,8 +301,12 @@ function renderEvaluacion() {
 }
 function renderSinFecha() {
   const sf = estado.datos.incidentes_sin_fecha || [];
-  $("sin-fecha").hidden = !sf.length;
-  $("sin-fecha").innerHTML = `<p><b>Incidentes sin fecha conocida (${sf.length})</b>: no se dibujan en la línea de tiempo ni entran al cálculo hasta conocer la fecha.</p><ul>${sf.map(itemEvento).join("")}</ul>`;
+  const desc = estado.datos.incidentes_descartados || [];
+  $("sin-fecha").hidden = !sf.length && !desc.length;
+  $("sin-fecha").innerHTML =
+    (sf.length ? `<p><b>Incidentes sin fecha conocida (${sf.length})</b>: no se dibujan en la línea de tiempo ni entran al cálculo hasta conocer la fecha.</p><ul>${sf.map(itemEvento).join("")}</ul>` : "") +
+    (desc.length ? `<p><b>Incidentes descartados por el analista (${desc.length})</b>: se conservan por trazabilidad, pero no entran a ningún cálculo.</p>
+      <ul>${desc.map((e) => `<li><s>${esc(e.titulo)}</s> <span class="fecha">— ${esc(e.motivo_decision || "descartado")}</span></li>`).join("")}</ul>` : "");
 }
 
 // ---------- alertas ----------

@@ -152,6 +152,7 @@ def ejecutar(recolectar_en_vivo: bool = True) -> dict:
         "historico_gdelt": _estado_historico(),
         "evaluacion": resultado_eval,
         "incidentes_sin_fecha": historico.cargar_incidentes_sin_fecha(),
+        "incidentes_descartados": historico.cargar_incidentes_descartados(),
         "informe_ia": informe,
     }
     guardar_json(ARCHIVO_SALIDA_WEB, salida, compacto=True)
