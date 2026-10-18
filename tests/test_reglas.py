@@ -119,3 +119,22 @@ class TestFiltroConfianza(unittest.TestCase):
         filtrado = evaluacion.evaluar(evs, SEM, [7], "2024-02-01", "2024-03-31", confianzas={"media", "alta"})
         self.assertEqual(todos["ventanas"][0]["grupos"]["hacktivista"]["n"], 2)
         self.assertEqual(filtrado["ventanas"][0]["grupos"]["hacktivista"]["n"], 1)
+
+
+class TestSoloVerificados(unittest.TestCase):
+    def test_usa_solo_verificados(self):
+        from monitor import evaluacion
+        evs = [ev("h", "2024-02-06", "geo", origen="hecho_clave"),
+               {**ev("a1", "2024-02-09", "ataque", origen="incidente_csv"), "tipo_actor": "hacktivista", "verificado": "si"},
+               {**ev("a2", "2024-02-10", "ataque", origen="incidente_csv"), "tipo_actor": "hacktivista", "verificado": "no"}]
+        r = evaluacion.evaluar(evs, SEM, [7], "2024-02-01", "2024-03-31", solo_verificados=True)
+        self.assertEqual(r["ventanas"][0]["grupos"]["hacktivista"]["n"], 1)
+
+
+class TestDeduplicacion(unittest.TestCase):
+    def test_noticias_del_mismo_dia_cuentan_una_vez(self):
+        from monitor import evaluacion
+        evs = [ev("n1", "2024-04-17", "ataque", "A"), ev("n2", "2024-04-17", "ataque", "B"),
+               ev("n3", "2024-04-18", "ataque", "A")]
+        r = evaluacion.evaluar(evs, SEM, [7], "2024-04-01", "2024-04-30")
+        self.assertEqual(r["ventanas"][0]["grupos"]["detectado_automaticamente"]["n"], 2)

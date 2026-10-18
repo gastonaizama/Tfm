@@ -369,7 +369,7 @@ add(
 add(
   H1("10. Pruebas y verificación"),
   H2("10.1. Pruebas automáticas"),
-  P("El archivo `tests/test_reglas.py` contiene 16 pruebas que se ejecutan antes de cada revisión. Si alguna falla, la revisión se detiene y la web publicada no cambia."),
+  P("El archivo `tests/test_reglas.py` contiene 18 pruebas que se ejecutan antes de cada revisión. Si alguna falla, la revisión se detiene y la web publicada no cambia."),
   tabla(["Prueba", "Qué comprueba"], [
     ["Hecho geopolítico", "«embajada argentina a Jerusalén» se clasifica como geopolítico"],
     ["Geo débil", "«Argentina votó en la ONU…» (1 punto) se descarta"],
@@ -441,6 +441,9 @@ add(
     ["D27", "Incidentes sin fecha fuera del cálculo", "No distorsionar la evaluación"],
     ["D28", "Período extendido hasta la actualidad", "Incluir la ola de ataques de agosto de 2024"],
     ["D29", "Evaluación con y sin incidentes de confianza baja", "Robustez de las conclusiones"],
+    ["D30", "Verificación del autor y confianza derivada del código", "El análisis del autor reemplaza la estimación inicial"],
+    ["D31", "Un evento por día en noticias detectadas", "Evitar contar varias veces el mismo ataque"],
+    ["D32", "Resultados que cambian con el histórico", "Interpretación prudente y recalibración"],
   ], [1100, 4600, 3938]),
 );
 
@@ -455,7 +458,7 @@ add(
   N("**Cargar los ataques conocidos**: **hecho el 14/10/2026** (13 incidentes en `datos/incidentes_historicos.csv`). Queda ampliarlo para el período extendido.", "numeros5"),
   N("**Verificar los 8 hechos clave:** confirmar fechas, completar `fuente_url` y marcar `verificado = si`.", "numeros5"),
   N("Completar el nombre del autor en la portada de esta memoria.", "numeros5"),
-  N("**Verificar los 23 incidentes y los 16 hechos clave cargados** (capítulo 14) y averiguar las fechas de REM y Stucx Team.", "numeros5"),
+  N("**Completar la verificación:** quedan 13 incidentes (entre ellos 6 de los 7 hacktivistas) y los 16 hechos clave (sección 14.6). Averiguar las fechas de REM y Stucx Team.", "numeros5"),
   H2("13.3. Próximos pasos propuestos"),
   V("**Evaluación del modelo:** proporción de ataques ocurridos dentro de ventanas de vigilancia, días de anticipación entre detonante y ataque, y alertas sin ataques posteriores."),
   V("**Análisis de sensibilidad:** comparar ventanas de 3, 7 y 14 días y distintos umbrales."),
@@ -517,6 +520,29 @@ add(
   V("Varios incidentes de la segunda lista son **reivindicaciones de grupos de ransomware** recogidas por agregadores (ransomware.live, SOCRadar), sin confirmación oficial: deben tratarse con confianza baja."),
 );
 
+// 14.6 Metodología de verificación
+add(
+  H2("14.6. Metodología de verificación"),
+  P("Todos los incidentes y hechos clave se cargaron como **no verificados**. La verificación la realiza el autor con un método estándar de inteligencia, apoyado en una planilla (\`datos/verificacion/planilla_verificacion.xlsx\`):"),
+  N("**Fuente:** comprobar que la fuente existe y describe ese hecho.", "numeros6"),
+  N("**Fecha real:** distinguir la fecha del hecho de la fecha de publicación de la nota.", "numeros6"),
+  N("**Actor y objetivo:** confirmar quién atacó y a quién.", "numeros6"),
+  N("**Corroboración:** buscar al menos una segunda fuente independiente (que no copie a la primera).", "numeros6"),
+  N("**Evidencia técnica:** Wayback Machine o Zone-H para defacements, ransomware.live para ransomware y filtraciones, comunicados oficiales para DDoS.", "numeros6"),
+  N("**Calificación con el Código Almirantazgo (OTAN):** una letra para la fiabilidad de la fuente (A totalmente fiable … F no se puede juzgar) y un número para la credibilidad de la información (1 confirmada … 6 no se puede juzgar).", "numeros6"),
+  N("**Decisión:** confirmado, reivindicado sin confirmar o descartado.", "numeros6"),
+  tabla(["Fiabilidad de la fuente", "Credibilidad de la información"], [
+    ["A — Totalmente fiable (organismo oficial, el afectado)", "1 — Confirmada por fuentes independientes"],
+    ["B — Normalmente fiable (medio serio, empresa de seguridad)", "2 — Probablemente cierta"],
+    ["C — Bastante fiable (medio menor, investigador)", "3 — Posiblemente cierta"],
+    ["D — No siempre fiable (blog, agregador, redes)", "4 — Dudosa"],
+    ["E — Poco fiable (el propio atacante)", "5 — Improbable"],
+    ["F — No se puede juzgar", "6 — No se puede juzgar"],
+  ], [4819, 4819]),
+  espacio(),
+  P("La planilla ordena los incidentes del más reciente al más antiguo (los de fecha desconocida, al final) e indica una prioridad: los hacktivistas y los de fecha desconocida son los que más influyen en la evaluación del modelo."),
+);
+
 // 15. Evaluación y extensión del período
 const datosWeb = JSON.parse(fs.readFileSync(path.join(RAIZ, "web", "datos.json"), "utf8"));
 const evTodas = datosWeb.evaluacion.todos || datosWeb.evaluacion;
@@ -532,24 +558,27 @@ add(
   P("Se evalúan ventanas de 3, 7, 14 y 21 días (**análisis de sensibilidad**). La de 7 días es la que usa el semáforo."),
   H2("15.2. Resultados preliminares"),
   P(`Período evaluado: ${ev.inicio} a ${ev.fin} (${ev.dias} días, ${ev.detonantes} días detonantes). Datos al ${datosWeb.generado.slice(0, 10)}.`),
-  H3("Con todos los incidentes"),
-  tabla(["Ventana", "Cobertura", "Hacktivista", "Cibercriminal", "Desconocido"],
-    ev.ventanas.map((v) => [`${v.ventana_dias} días`, `${v.cobertura_pct} %`, celdaEv(v.grupos.hacktivista), celdaEv(v.grupos.cibercriminal), celdaEv(v.grupos.desconocido)]),
-    [1500, 1500, 2300, 2169, 2169]),
-  espacio(),
-  ...(evFiltro ? [
-    H3("Solo incidentes de confianza media o alta (robustez)"),
-    tabla(["Ventana", "Cobertura", "Hacktivista", "Cibercriminal", "Desconocido"],
-      evFiltro.ventanas.map((v) => [`${v.ventana_dias} días`, `${v.cobertura_pct} %`, celdaEv(v.grupos.hacktivista), celdaEv(v.grupos.cibercriminal), celdaEv(v.grupos.desconocido)]),
-      [1500, 1500, 2300, 2169, 2169]),
-    espacio(),
-  ] : []),
+  ...[["todos", "Con todos los incidentes"], ["confianza_media_alta", "Solo incidentes de confianza media o alta (robustez)"], ["verificados", "Solo incidentes verificados por el autor"]]
+    .filter(([k]) => datosWeb.evaluacion[k]).flatMap(([k, titulo]) => [
+      H3(titulo),
+      tabla(["Ventana", "Cobertura", "Hacktivista", "Cibercriminal", "Desconocido"],
+        datosWeb.evaluacion[k].ventanas.map((v) => [`${v.ventana_dias} días`, `${v.cobertura_pct} %`, celdaEv(v.grupos.hacktivista), celdaEv(v.grupos.cibercriminal), celdaEv(v.grupos.desconocido)]),
+        [1500, 1500, 2300, 2169, 2169]),
+      espacio(),
+    ]),
   ...figura("web_evaluacion.png", "Sección «Evaluación del modelo» en la página, con los incidentes sin fecha al pie."),
   H2("15.3. Lectura de los resultados"),
-  V("Con la ventana de **7 días** (la del semáforo) **ningún** ataque hacktivista cae dentro de una ventana. Con **21 días**, la razón de los hacktivistas es de alrededor de **2** (1,92 con todos los incidentes y 1,68 solo con los de confianza media o alta), mientras que la de los cibercriminales queda **por debajo de 1** (0,75 y 0,84)."),
-  V("El patrón se mantiene en las dos variantes, lo que sugiere que no depende de los datos más débiles (**robustez**)."),
-  V("Lectura preliminar: si existe relación entre geopolítica y hacktivismo contra Argentina, la reacción no es inmediata, sino que ocurre en un plazo de **dos a tres semanas**. Dos casos lo ilustran: LulzSec Muslims (16 días después de la visita a Israel de 2024) y el intento de DDoS a la Cancillería (19 días después del ingreso al Board of Peace). Esto pone en discusión la ventana de 7 días fijada en los requisitos iniciales."),
-  V("El defacement de argentina.gob.ar (19/10/2023), de motivación política interna, cae dentro de la ventana abierta tras el 7 de octubre de 2023 y pone el semáforo en rojo: es un **falso positivo** que muestra el límite de un modelo basado solo en fechas."),
+  P("Los resultados **cambian a medida que se completa el histórico de GDELT** (decisión D32). Conviene leerlos como una foto de cada momento:"),
+  tabla(["Fecha", "Datos", "Hacktivistas (21 días)", "Cibercriminales (21 días)"], [
+    ["14/10/2026", "~199 eventos geopolíticos; 23 incidentes", "razón 1,92 (todos) · 1,68 (media/alta)", "razón 0,75 · 0,84"],
+    ["18/10/2026", "~691 eventos geopolíticos; 10 incidentes verificados", "razón 1,57 (todos) · 1,38 (media/alta)", "razón 0,92 · 1,38"],
+  ], [1400, 3000, 2700, 2538]),
+  espacio(),
+  V("Con más noticias detonantes, las ventanas cubren más días (con 21 días, cerca del 36 % del período). Así la ventaja de los hacktivistas se achica y, con confianza media o alta, se iguala a la de los cibercriminales. **La hipótesis no puede confirmarse con los datos actuales.**"),
+  V("Con solo los incidentes **verificados** hay un único ataque hacktivista (Cancillería, 05/02/2026): cae dentro de la ventana de 21 días, pero un caso no permite conclusiones."),
+  V("Dos casos siguen ilustrando una posible reacción a las **dos o tres semanas**: LulzSec Muslims (16 días después de la visita a Israel de 2024) y el intento de DDoS a la Cancillería (19 días después del ingreso al Board of Peace)."),
+  V("Si la cobertura sigue creciendo al completarse el histórico, habrá que **recalibrar el umbral de detonante** (por ejemplo, exigir 3 fuentes distintas por día) para que las ventanas sigan siendo selectivas."),
+  V("**Falsos positivos observados:** el defacement de argentina.gob.ar (19/10/2023), de motivación interna, dentro de la ventana posterior al 7 de octubre; y una noticia sobre la detención de personas que amenazaron con bombas, clasificada como ataque por las palabras clave."),
   nota("**Advertencia:** son muy pocos incidentes y casi todos sin verificar. Estos números ilustran el **método**; no permiten conclusiones. Al completarse el histórico de GDELT y verificarse los incidentes, la tabla se recalcula sola."),
   H2("15.4. Extensión del período hasta la actualidad"),
   P("A pedido del autor, el período histórico se extendió a **01/08/2023 – 11/10/2026** (el día anterior al inicio del monitoreo en vivo). El caso de estudio original se mantiene como período predefinido en la página. La descarga de GDELT conserva lo ya obtenido y pasa de 196 a 623 tramos, por lo que tardará varios días más en completarse."),
@@ -612,7 +641,7 @@ const doc = new Document({
   numbering: {
     config: [
       { reference: "vinetas", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
-      ...["numeros", "numeros2", "numeros3", "numeros4", "numeros5"].map((ref) => ({
+      ...["numeros", "numeros2", "numeros3", "numeros4", "numeros5", "numeros6"].map((ref) => ({
         reference: ref, levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }],
       })),
     ],

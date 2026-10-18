@@ -30,6 +30,16 @@
       "version": "0.5",
       "fecha": "14/10/2026",
       "cambios": "Carga de la segunda lista (8 hechos clave y 10 incidentes) y evaluación con filtro por confianza (análisis de robustez)."
+    },
+    {
+      "version": "0.6",
+      "fecha": "17/10/2026",
+      "cambios": "Metodología de verificación (Código Almirantazgo, corroboración y evidencia técnica) y planilla de verificación para el autor."
+    },
+    {
+      "version": "0.7",
+      "fecha": "18/10/2026",
+      "cambios": "Primeros 10 incidentes verificados por el autor (Código Almirantazgo), variante de evaluación 'solo verificados' y depuración de noticias duplicadas."
     }
   ],
   "eventos": [
@@ -194,6 +204,48 @@
       "tipo": "Resultado",
       "titulo": "Resultados con 23 incidentes y 16 hechos clave",
       "detalle": "Con ventana de 21 días, los hacktivistas tienen una razón de 1,92 (todos los incidentes) y 1,68 (solo confianza media/alta), frente a 0,75 y 0,84 de los cibercriminales. Con 7 días, ningún ataque hacktivista cae dentro de las ventanas. El patrón se mantiene en ambas variantes."
+    },
+    {
+      "fecha": "14/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Pull Request #3 fusionado",
+      "detalle": "El autor fusionó el PR con la segunda lista (23 incidentes y 16 hechos clave en total) y la evaluación con filtro por confianza."
+    },
+    {
+      "fecha": "17/10/2026",
+      "tipo": "Metodología",
+      "titulo": "Método de verificación de los datos",
+      "detalle": "Se definió cómo verificar cada incidente y hecho clave: comprobar la fuente y la fecha real del hecho, corroborar con una fuente independiente, buscar evidencia técnica (Wayback Machine, Zone-H, ransomware.live) y calificar con el Código Almirantazgo (fiabilidad A–F y credibilidad 1–6). Decisión final: confirmado, reivindicado sin confirmar o descartado."
+    },
+    {
+      "fecha": "17/10/2026",
+      "tipo": "Documentación",
+      "titulo": "Planilla de verificación",
+      "detalle": "Se generó datos/verificacion/planilla_verificacion.xlsx con los 23 incidentes (ordenados por prioridad) y los 16 hechos clave, columnas a completar con listas desplegables y un resumen de avance automático."
+    },
+    {
+      "fecha": "17/10/2026",
+      "tipo": "Documentación",
+      "titulo": "Planilla ordenada por fecha",
+      "detalle": "A pedido del autor, los incidentes de la planilla de verificación se ordenaron del más reciente al más antiguo (los de fecha desconocida, al final). La columna de prioridad se mantiene para filtrar."
+    },
+    {
+      "fecha": "18/10/2026",
+      "tipo": "Verificación",
+      "titulo": "El autor verificó 10 incidentes",
+      "detalle": "Códigos asignados: INC-021 C3, INC-020 B2, INC-019 C4, INC-018 B2, INC-017 A1, INC-016 B4, INC-015 A1, INC-014 B3, INC-008 A1, INC-007 A1. Se marcaron como verificados y su confianza se derivó del código (decisión D30)."
+    },
+    {
+      "fecha": "18/10/2026",
+      "tipo": "Desarrollo",
+      "titulo": "Evaluación 'solo verificados' y depuración de duplicados",
+      "detalle": "Nueva variante de la evaluación con los incidentes verificados. En el grupo detectado en noticias se cuenta un evento por día, porque cinco artículos italianos describían la misma filtración (D31). Se detectó un falso positivo del clasificador (detención por amenazas de bomba)."
+    },
+    {
+      "fecha": "18/10/2026",
+      "tipo": "Resultado",
+      "titulo": "Resultados actualizados con más histórico de GDELT",
+      "detalle": "Con 127 tramos descargados (unos 28.000 artículos) los eventos geopolíticos pasaron de 199 a 691 y la cobertura de las ventanas aumentó. Con 21 días: hacktivistas razón 1,57 y cibercriminales 0,92 (todos); 1,38 para ambos (confianza media/alta); en 'solo verificados' hay un único incidente hacktivista, insuficiente para concluir (D32)."
     }
   ]
 }

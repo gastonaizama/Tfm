@@ -18,6 +18,8 @@ El grupo de comparación (cibercriminales) debería dar una razón cercana a 1.
 Con `confianzas` se puede restringir la evaluación a los incidentes cargados a mano con
 cierto nivel de confianza (por ejemplo {"media", "alta"}) para comprobar que las
 conclusiones se mantienen sin los datos más débiles (análisis de robustez).
+Con `solo_verificados=True` se usan únicamente los incidentes que el autor verificó
+(columna `verificado = si`, con su código del Almirantazgo).
 """
 from datetime import date, timedelta
 from statistics import median
@@ -32,14 +34,28 @@ def _d(s: str) -> date:
 
 
 def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio: str, fin: str,
-            confianzas: set[str] | None = None) -> dict:
+            confianzas: set[str] | None = None, solo_verificados: bool = False) -> dict:
     ini, fn = _d(inicio), _d(fin)
     total_dias = (fn - ini).days + 1
     detonantes = semaforo.dias_detonantes(eventos, cfg_semaforo["min_fuentes_distintas_por_dia"])
     dias_detonantes = sorted(_d(d) for d in detonantes)
     ataques = [e for e in eventos if e["carril"] == "ataque" and ini <= _d(e["dia"]) <= fn
                and (confianzas is None or e.get("origen") != "incidente_csv"
-                    or (e.get("confianza") or "").lower() in confianzas)]
+                    or (e.get("confianza") or "").lower() in confianzas)
+               and (not solo_verificados or e.get("origen") != "incidente_csv"
+                    or (e.get("verificado") or "").lower() == "si")]
+
+    # Varias noticias del mismo día suelen describir el MISMO ataque (por ejemplo, cinco medios
+    # italianos sobre la filtración de licencias de conducir): en el grupo detectado
+    # automáticamente se cuenta un solo evento por día. Los incidentes cargados a mano no se agrupan.
+    vistos, depurados = set(), []
+    for e in ataques:
+        if e.get("origen") != "incidente_csv":
+            if e["dia"] in vistos:
+                continue
+            vistos.add(e["dia"])
+        depurados.append(e)
+    ataques = depurados
 
     resultados = []
     for v in ventanas:
@@ -81,4 +97,5 @@ def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio
                            "periodos": len(periodos), "grupos": salida})
     return {"inicio": ini.isoformat(), "fin": fn.isoformat(), "dias": total_dias,
             "confianzas": sorted(confianzas) if confianzas else "todas",
+            "solo_verificados": solo_verificados,
             "detonantes": len(dias_detonantes), "ventanas": resultados}
