@@ -264,7 +264,9 @@ function itemEvento(e) {
   const grupos = (e.grupos || []).map((g) => `<span class="chip">👥 ${esc(g)}</span>`).join("");
   const actor = e.tipo_actor ? `<span class="chip">${esc(ACTOR_TXT[e.tipo_actor] || e.tipo_actor)}</span>` : "";
   const aprox = e.fecha_precision && e.fecha_precision !== "dia" ? `<span class="chip" title="La fecha no es exacta">fecha ${esc(e.fecha_precision)}</span>` : "";
-  const verif = e.origen === "incidente_csv" && e.verificado !== "si" ? `<span class="chip" title="Pendiente de verificación por el analista">sin verificar</span>` : "";
+  const verif = e.origen !== "incidente_csv" ? "" : e.verificado === "si"
+    ? `<span class="chip chip-ok" title="Verificado por el analista (Código Almirantazgo: fiabilidad de la fuente A-F y credibilidad 1-6)">✔ verificado${e.codigo_almirantazgo ? " · " + esc(e.codigo_almirantazgo) : ""}</span>`
+    : `<span class="chip" title="Pendiente de verificación por el analista">sin verificar</span>`;
   return `<li>${enlace(e.url, e.titulo)} <span class="fecha">— ${esc(e.fuente)} · ${ORIGEN_TXT[e.origen] || e.origen}</span> ${actor}${grupos}${aprox}${verif}${chipsMitre(e.tecnicas)}</li>`;
 }
 
@@ -281,7 +283,8 @@ function renderEvaluacion() {
     (x.razon !== null ? `<br><small>razón ${x.razon}${x.anticipacion_mediana !== null ? ` · ${x.anticipacion_mediana} d` : ""}</small>` : "");
   const selector = variantes.ventanas ? "" : `<p class="metodologia"><label>Incidentes incluidos:
     <select id="variante-eval"><option value="todos"${clave === "todos" ? " selected" : ""}>Todos</option>
-    <option value="confianza_media_alta"${clave === "confianza_media_alta" ? " selected" : ""}>Solo confianza media o alta</option></select></label>
+    <option value="confianza_media_alta"${clave === "confianza_media_alta" ? " selected" : ""}>Solo confianza media o alta</option>
+    <option value="verificados"${clave === "verificados" ? " selected" : ""}>Solo verificados por el analista</option></select></label>
     · Si las conclusiones se mantienen en ambos casos, el resultado es más sólido.</p>`;
   $("evaluacion").innerHTML = selector + `
     <p class="metodologia">Período evaluado: ${fechaLarga(ev.inicio)} – ${fechaLarga(ev.fin)} · ${ev.detonantes} días detonantes.

@@ -129,6 +129,8 @@ def ejecutar(recolectar_en_vivo: bool = True) -> dict:
         "todos": evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval, hoy.isoformat()),
         "confianza_media_alta": evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval,
                                                    hoy.isoformat(), confianzas={"media", "alta"}),
+        "verificados": evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval,
+                                          hoy.isoformat(), solo_verificados=True),
     }
 
     # Fase 2 (desactivada por defecto): clasificación con Haiku e informe con Sonnet.

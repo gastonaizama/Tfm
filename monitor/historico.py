@@ -75,6 +75,7 @@ def _evento_incidente(f: dict) -> dict:
         "motivacion": f.get("motivacion_declarada", ""),
         "confianza": f.get("confianza", ""),
         "verificado": f.get("verificado", ""),
+        "codigo_almirantazgo": f.get("codigo_almirantazgo", ""),
     }
 
 

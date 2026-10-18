@@ -147,3 +147,4 @@ footer { color: var(--texto-3); font-size: .82rem; padding-bottom: 30px; }
 tr.actual td { background: var(--banda-a); }
 #evaluacion td, #evaluacion th { text-align: center; }
 #evaluacion td:first-child, #evaluacion th:first-child { text-align: left; }
+.chip-ok { border-color: var(--ok); }

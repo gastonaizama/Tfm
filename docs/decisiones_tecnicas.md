@@ -177,6 +177,19 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
 - **Decisión (del autor, 14/10/2026):** cargar **todos** los candidatos, igual que en la primera lista, y calcular la evaluación en dos variantes: con todos los incidentes y solo con los de confianza media o alta. La web permite alternar entre ambas.
 - **Motivo:** mantener el mismo criterio en todo el período y no vaciar el grupo de comparación (la mayoría de los incidentes de confianza baja son cibercriminales), sin resignar rigor. Si las conclusiones se mantienen en ambas variantes, el resultado es más robusto.
 
+### D30. Verificación del analista y confianza derivada del Código Almirantazgo
+- **Contexto:** el autor verificó 10 incidentes (18/10/2026) y asignó a cada uno un código del Almirantazgo (fiabilidad de la fuente A–F y credibilidad de la información 1–6).
+- **Decisión:** esos incidentes se marcan `verificado = si`, el código se guarda en `codigo_almirantazgo` y la **confianza** pasa a derivarse del código: **alta** si la fuente es A o B y la credibilidad 1 o 2; **media** si la fuente es A, B o C y la credibilidad hasta 3; **baja** en el resto. La evaluación suma una tercera variante, **"Solo verificados"**.
+- **Motivo:** el análisis del autor reemplaza la estimación inicial hecha durante la búsqueda automática, con una regla explícita y reproducible.
+
+### D31. Una noticia de ataque por día en el grupo detectado automáticamente
+- **Contexto:** al avanzar la descarga de GDELT aparecieron cinco artículos italianos sobre la misma filtración (licencias de conducir, 17/04/2024), contados como cinco ataques.
+- **Decisión:** en el grupo "detectado en noticias" de la evaluación se cuenta **un solo evento por día**. Los incidentes cargados a mano no se agrupan.
+- **Limitación detectada:** el clasificador por palabras clave tomó como ataque una nota sobre la detención de personas que amenazaron con bombas, que no es un ciberataque: es un falso positivo a tratar en la Fase 2 (IA).
+
+### D32. Los resultados cambian a medida que se completa el histórico
+- Con más noticias de GDELT hay más días detonantes y las ventanas cubren más días (con 21 días, la cobertura pasó de cerca del 30 % a cerca del 36 %). Las razones se recalculan solas y no deben citarse como definitivas hasta que el histórico esté completo. Si la cobertura sigue creciendo, habrá que **recalibrar el umbral de detonante** (por ejemplo, exigir 3 fuentes por día) para que las ventanas sigan siendo selectivas.
+
 ## F. Fase 2 (diseño previsto)
 
 ### D25. Modelos y contrato de datos de la IA
