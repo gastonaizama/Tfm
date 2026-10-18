@@ -269,6 +269,12 @@
       "tipo": "Resultado",
       "titulo": "Resultados con incidentes verificados",
       "detalle": "Solo verificados, ventana de 21 días: hacktivistas 4 de 5 dentro de ventanas (razón 2,20) frente a cibercriminales 1 de 6 (razón 0,46). Con 14 días: 1,23 frente a 0,51. Cuatro de los cinco hacktivistas verificados tienen fuentes de fiabilidad D: resultado indicativo, no concluyente."
+    },
+    {
+      "fecha": "18/10/2026",
+      "tipo": "Verificación",
+      "titulo": "INC-022 descartado",
+      "detalle": "El autor descartó INC-022 (hackers de origen egipcio contra la AFA) por no guardar relación con el Estado argentino. Con esto quedan verificados todos los incidentes hacktivistas con fecha."
     }
   ]
 }
