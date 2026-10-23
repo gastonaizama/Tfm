@@ -275,6 +275,12 @@
       "tipo": "Verificación",
       "titulo": "INC-022 descartado",
       "detalle": "El autor descartó INC-022 (hackers de origen egipcio contra la AFA) por no guardar relación con el Estado argentino. Con esto quedan verificados todos los incidentes hacktivistas con fecha."
+    },
+    {
+      "fecha": "23/10/2026",
+      "tipo": "Decisión",
+      "titulo": "INC-022 confirmado como descartado y recalibración postergada",
+      "detalle": "El autor confirmó que INC-022 (AFA, código B1) queda descartado por no guardar relación con el Estado argentino. Estado de la carga: 23 incidentes, 17 revisados por el autor (14 en uso y 3 descartados) y 6 sin revisar (INC-009 a INC-013 e INC-023), que solo cuentan en la variante 'todos'. Con la descarga de GDELT en 304 de 623 tramos, la cobertura de la ventana de 21 días llegó a 61,2 %. Una prueba con 3 a 6 fuentes por día como mínimo redujo la cobertura pero dejó afuera de la ventana de 7 días a la mayoría de los hacktivistas. Se decide esperar a que termine la descarga antes de recalibrar el umbral (D32)."
     }
   ]
 }
