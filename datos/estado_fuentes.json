@@ -1,5 +1,5 @@
 {
- "fecha": "2026-10-23T11:47:14+00:00",
+ "fecha": "2026-10-23T17:15:27+00:00",
  "fuentes": [
   {
    "nombre": "The Record",
@@ -45,7 +45,7 @@
    "nombre": "La Nación",
    "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml",
    "ok": true,
-   "items": 95,
+   "items": 88,
    "detalle": "",
    "http": 200
   },
