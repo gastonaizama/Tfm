@@ -1,5 +1,5 @@
 {
- "fecha": "2026-10-26T22:45:32+00:00",
+ "fecha": "2026-10-27T05:13:47+00:00",
  "fuentes": [
   {
    "nombre": "The Record",
@@ -45,7 +45,7 @@
    "nombre": "La Nación",
    "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml",
    "ok": true,
-   "items": 86,
+   "items": 91,
    "detalle": "",
    "http": 200
   },
@@ -59,9 +59,9 @@
   {
    "nombre": "GDELT DOC API",
    "url": "(Argentina OR argentino OR Argentine OR \"gob.ar\") (hackeo OR hackers OR ciberataque OR hacktivistas OR hacktivists OR cyberattack OR DDoS OR defacement OR \"filtración de datos\" OR \"data leak\")",
-   "ok": true,
+   "ok": false,
    "items": 0,
-   "detalle": ""
+   "detalle": "LimiteGdelt: GDELT: límite de consultas (HTTP 429)"
   }
  ]
 }
