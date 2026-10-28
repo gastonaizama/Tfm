@@ -1,5 +1,5 @@
 {
- "fecha": "2026-10-27T22:19:45+00:00",
+ "fecha": "2026-10-28T05:49:25+00:00",
  "fuentes": [
   {
    "nombre": "The Record",
@@ -53,15 +53,15 @@
    "nombre": "GDELT DOC API",
    "url": "(Argentina OR argentino OR Argentine OR Milei) (Israel OR Hamas OR Iran OR AMIA OR embajada OR embassy OR Palestina OR Palestinian OR Hezbollah)",
    "ok": true,
-   "items": 2,
+   "items": 0,
    "detalle": ""
   },
   {
    "nombre": "GDELT DOC API",
    "url": "(Argentina OR argentino OR Argentine OR \"gob.ar\") (hackeo OR hackers OR ciberataque OR hacktivistas OR hacktivists OR cyberattack OR DDoS OR defacement OR \"filtración de datos\" OR \"data leak\")",
-   "ok": true,
+   "ok": false,
    "items": 0,
-   "detalle": ""
+   "detalle": "LimiteGdelt: GDELT: límite de consultas (HTTP 429)"
   }
  ]
 }
