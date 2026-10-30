@@ -195,6 +195,14 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
 - **Decisión:** se marcan `decision = descartado` con su motivo. No se borran: se listan en la página con el motivo (trazabilidad), pero no entran a la línea de tiempo, al semáforo ni a la evaluación.
 - **Observación metodológica:** 4 de los 5 hacktivistas verificados tienen fuentes de fiabilidad **D** (no siempre fiable). La variante "solo verificados" muestra la mayor diferencia entre hacktivistas y cibercriminales, pero se apoya en fuentes débiles. La variante "confianza media o alta" casi no conserva hacktivistas. Para la discusión, el resultado es **indicativo, no concluyente**, y la limitación principal es la escasez de fuentes fiables sobre hacktivismo (que se anuncia sobre todo en Telegram y X).
 
+### D34. Monitoreo de los canales públicos de Telegram de los grupos
+- **Contexto:** el hacktivismo se anuncia sobre todo en Telegram (D33) y el autor identificó los canales de LulzSec Muslims y LulzSec Black, además de un grupo privado.
+- **Decisión (del autor, 30/10/2026):** "camino A": leer solo los **canales públicos** a través de su vista web (`t.me/s/<canal>`), cada 6 horas junto con las demás fuentes y sin cuenta ni claves. El grupo privado queda fuera: requeriría entrar con una cuenta (API de Telegram y una clave de sesión guardada como secreto) y publicar en un repositorio público contenido de un espacio cerrado.
+- **Regla:** un mensaje es ataque **reclamado** si menciona a Argentina, un dominio `.ar` o la bandera 🇦🇷 y tiene una señal de ataque (término cibernético, dominio `.ar` o una palabra de `palabras_clave.senales_reclamo`, como "down" o "check-host"). Así, una proclama política que solo nombra a Argentina no se toma como ataque.
+- **Valoración:** son fuentes primarias del **reclamo**, no prueba del ataque. Se muestran como "reclamo del grupo, sin verificar" y forman un grupo aparte en la evaluación ("Reclamos en Telegram", un evento por día). Para pasar a `incidentes_historicos.csv` deben pasar por la verificación del autor (Código Almirantazgo).
+- **Ética:** solo se guarda el texto recortado del mensaje y su enlace; nunca archivos, imágenes ni enlaces de descarga.
+- **Limitaciones:** cada lectura ve las últimas páginas del canal (unos 60 mensajes); si el canal desactiva la vista pública o es cerrado, la fuente deja de funcionar (se ve en "Estado de las fuentes").
+
 ## F. Fase 2 (diseño previsto)
 
 ### D25. Modelos y contrato de datos de la IA

@@ -7,7 +7,7 @@ from . import evaluacion, historico, mitre, semaforo
 from .clasificador import Clasificador
 from .config import (ARCHIVO_ESTADO_FUENTES, ARCHIVO_GDELT_HIST, ARCHIVO_NOTICIAS, ARCHIVO_SALIDA_WEB, cargar_config,
                      cargar_mapeo_mitre, guardar_json, leer_json)
-from .fuentes import gdelt, rss
+from .fuentes import gdelt, rss, telegram
 from .ia import integracion as ia
 
 
@@ -27,6 +27,14 @@ def recolectar(config: dict) -> tuple[list[dict], list[dict]]:
         noticias.extend(items)
         diagnostico.append(diag)
 
+    for canal in config.get("fuentes_telegram", {}).get("canales", []):
+        if not canal.get("activa", True):
+            continue
+        items, diag = telegram.leer_canal(canal)
+        print(f"[Telegram] {canal['nombre']}: {'OK' if diag['ok'] else 'FALLA'} ({diag['items']} mensajes) {diag['detalle']}")
+        noticias.extend(items)
+        diagnostico.append(diag)
+
     cfg = config["gdelt"]
     for q in cfg["consultas_geopoliticas"] + cfg["consultas_ciber"]:
         diag = {"nombre": "GDELT DOC API", "url": q, "ok": False, "items": 0, "detalle": ""}
@@ -42,6 +50,11 @@ def recolectar(config: dict) -> tuple[list[dict], list[dict]]:
     return noticias, diagnostico
 
 
+def _clasificar(clasificador: Clasificador, n: dict) -> dict:
+    # Los mensajes de los canales de Telegram de los grupos se leen como reclamos (ver clasificador.py)
+    return clasificador.clasificar(n["titulo"], n.get("resumen", ""), n["url"], reclamo=n.get("origen") == "telegram")
+
+
 def actualizar_almacen(nuevas: list[dict], clasificador: Clasificador, config: dict) -> list[dict]:
     """Acumula en datos/noticias_vivo.json las noticias potencialmente relevantes.
 
@@ -55,7 +68,7 @@ def actualizar_almacen(nuevas: list[dict], clasificador: Clasificador, config: d
     for n in nuevas:
         if n["url"] in almacen:
             continue
-        c = clasificador.clasificar(n["titulo"], n.get("resumen", ""), n["url"])
+        c = _clasificar(clasificador, n)
         if c["menciona_argentina"] and (c["terminos_geo"] or c["terminos_ciber"]):
             n["visto_por_primera_vez"] = ahora
             almacen[n["url"]] = n
@@ -70,7 +83,7 @@ def actualizar_almacen(nuevas: list[dict], clasificador: Clasificador, config: d
 def construir_eventos(noticias: list[dict], clasificador: Clasificador) -> list[dict]:
     eventos, vistos = [], set()
     for n in noticias:
-        c = clasificador.clasificar(n["titulo"], n.get("resumen", ""), n["url"])
+        c = _clasificar(clasificador, n)
         carril = clasificador.carril(c)
         if not carril:
             continue

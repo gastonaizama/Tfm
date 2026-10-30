@@ -147,3 +147,60 @@ class TestDescartados(unittest.TestCase):
         for e in historico.cargar_incidentes_descartados():
             self.assertNotIn(e["id"], ids)
             self.assertEqual(e["decision"], "descartado")
+
+
+# Página de ejemplo con la MISMA ESTRUCTURA que t.me/s/<canal> (textos inventados solo para la prueba).
+PAGINA_TELEGRAM = """
+<div class="tgme_widget_message_wrap"><div class="tgme_widget_message js-widget_message" data-post="canal_prueba/10">
+ <div class="tgme_widget_message_text js-message_text" dir="auto">Primera línea<br/>segunda &amp; línea</div>
+ <a class="tgme_widget_message_date" href="https://t.me/canal_prueba/10"><time datetime="2024-02-22T10:00:00+00:00">10:00</time></a>
+</div></div>
+<div class="tgme_widget_message_wrap"><div class="tgme_widget_message js-widget_message" data-post="canal_prueba/11">
+ <div class="tgme_widget_message_reply"><div class="tgme_widget_message_text js-message_reply_text">texto citado</div></div>
+ <div class="tgme_widget_message_text js-message_text" dir="auto">Respuesta propia</div>
+ <time datetime="2024-02-23T11:00:00+00:00">11:00</time>
+</div></div>
+<div class="tgme_widget_message_wrap"><div class="tgme_widget_message js-widget_message" data-post="canal_prueba/12">
+ <a class="tgme_widget_message_photo_wrap"></a><time datetime="2024-02-24T12:00:00+00:00">12:00</time>
+</div></div>
+"""
+
+
+class TestTelegram(unittest.TestCase):
+    def test_lee_mensajes_de_la_vista_web(self):
+        from monitor.fuentes import telegram
+        msgs = telegram.parsear_pagina(PAGINA_TELEGRAM, {"nombre": "Prueba"})
+        self.assertEqual([m["url"] for m in msgs], ["https://t.me/canal_prueba/10", "https://t.me/canal_prueba/11"])
+        self.assertEqual(msgs[0]["titulo"], "Primera línea")
+        self.assertIn("segunda & línea", msgs[0]["resumen"])
+        self.assertEqual(msgs[1]["titulo"], "Respuesta propia")  # no toma el texto citado
+        self.assertEqual(msgs[0]["origen"], "telegram")
+        self.assertEqual(msgs[0]["fecha"][:10], "2024-02-22")
+
+    def test_reclamo_con_dominio_ar(self):
+        c = CLF.clasificar("Target down: ejemplo.gob.ar https://check-host.net/x", reclamo=True)
+        self.assertTrue(c["es_ataque"])
+        self.assertIn("ejemplo.gob.ar", c["dominios_ar"])
+
+    def test_reclamo_con_bandera(self):
+        self.assertTrue(CLF.clasificar("\U0001F1E6\U0001F1F7 down", reclamo=True)["es_ataque"])
+
+    def test_proclama_sin_senal_no_es_ataque(self):
+        c = CLF.clasificar("Argentina is an enemy of Palestine", reclamo=True)
+        self.assertTrue(c["menciona_argentina"])
+        self.assertFalse(c["es_ataque"])
+
+    def test_noticia_comun_no_usa_regla_de_reclamo(self):
+        self.assertFalse(CLF.clasificar("Target down: ejemplo.com.ar")["es_ataque"])
+        self.assertTrue(CLF.clasificar("Target down: ejemplo.com.ar", reclamo=True)["es_ataque"])
+
+    def test_reclamos_forman_grupo_aparte_en_evaluacion(self):
+        from monitor import evaluacion
+        eventos = [ev("hc", "2024-03-01", "geo", origen="hecho_clave"),
+                   ev("t1", "2024-03-03", "ataque", origen="telegram"),
+                   ev("t2", "2024-03-03", "ataque", origen="telegram"),
+                   ev("n1", "2024-03-03", "ataque", origen="rss")]
+        r = evaluacion.evaluar(eventos, SEM, [7], "2024-03-01", "2024-03-31")
+        g = r["ventanas"][0]["grupos"]
+        self.assertEqual(g["reclamo_telegram"]["n"], 1)  # mismo día: cuenta una vez
+        self.assertEqual(g["detectado_automaticamente"]["n"], 1)

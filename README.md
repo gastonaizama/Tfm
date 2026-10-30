@@ -64,7 +64,8 @@ No hay servidores ni bases de datos. Todo funciona con dos servicios gratuitos d
 2. **Día detonante**: hay noticias relevantes de **al menos 2 fuentes distintas** ese día (corroboración), o hay un **hecho clave** cargado a mano.
 3. **Ventana de vigilancia**: cada día detonante abre una ventana de 7 días. Si llega otro detonante con la ventana todavía abierta, la ventana se extiende.
 4. **Noticia de ataque**: contiene un término cibernético (hackeo, filtración de datos, DDoS, hacktivistas, gob.ar, Cyber Dragonz, LulzSec Muslims, REM, etc.) **y** menciona a Argentina.
-5. **Rojo**: aparece un ataque dentro de una ventana abierta. Los ataques fuera de cualquier ventana se muestran como alertas **informativas**, porque sirven para evaluar el modelo.
+5. **Reclamo en Telegram**: un mensaje de los canales públicos de los grupos (LulzSec Muslims, LulzSec Black) cuenta como ataque reclamado si menciona a Argentina, un dominio `.ar` o la bandera 🇦🇷, **y** tiene una señal de ataque (término cibernético, un dominio `.ar`, "down", un enlace a check-host, "leak", etc.). Es lo que el grupo **dice** que hizo: se muestra como "reclamo del grupo, sin verificar".
+6. **Rojo**: aparece un ataque dentro de una ventana abierta. Los ataques fuera de cualquier ventana se muestran como alertas **informativas**, porque sirven para evaluar el modelo.
 
 Todos los números se pueden cambiar en [`config/config.json`](config/config.json).
 
@@ -82,6 +83,9 @@ Todos los números se pueden cambiar en [`config/config.json`](config/config.jso
 | [La Nación](https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml) | Medio argentino | ✅ |
 | [GDELT DOC 2.0 API](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) | Noticias mundiales, con historial | ✅ (con límite de uso estricto; ver limitaciones) |
 | [MITRE ATT&CK](https://github.com/mitre/cti) | Catálogo de técnicas | ✅ |
+| Telegram: [LulzSec Muslims](https://t.me/s/Luls_sec_muslims) y [LulzSec Black](https://t.me/s/LulzSecBlack) | Canales públicos de los propios grupos (reclamos) | agregado el 30/10/2026, en prueba |
+
+**Telegram.** Se lee la vista web pública de cada canal (`t.me/s/<canal>`), la misma que se ve en el navegador sin iniciar sesión: no se usa ninguna cuenta ni clave. Solo se guarda el texto del mensaje (recortado) y el enlace; nunca archivos, imágenes ni enlaces de descarga, para no republicar datos filtrados. Los grupos privados (enlaces `t.me/+…`) no tienen vista web y **no** se monitorean. Lo que un grupo publica es un reclamo: sirve para fechar el ataque y conocer la motivación declarada, pero no prueba que haya ocurrido.
 
 La página muestra en cada revisión el estado de cada fuente, en la sección "Estado de las fuentes y metodología".
 

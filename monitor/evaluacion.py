@@ -1,7 +1,9 @@
 """Evaluación del modelo: ¿los ataques caen dentro de las ventanas de vigilancia?
 
 Para cada tamaño de ventana (análisis de sensibilidad) y cada tipo de actor
-(hacktivista, cibercriminal, estatal, desconocido) se calcula:
+(hacktivista, cibercriminal, estatal, desconocido) se calcula lo siguiente. Los ataques detectados
+automáticamente forman dos grupos aparte: reclamos en canales de Telegram de los grupos y
+noticias de ataques.
 
 - n: cantidad de ataques con fecha dentro del período evaluado.
 - dentro: cuántos ocurrieron dentro de una ventana de vigilancia.
@@ -26,7 +28,7 @@ from statistics import median
 
 from . import semaforo
 
-GRUPOS = ("hacktivista", "cibercriminal", "estatal", "desconocido", "detectado_automaticamente")
+GRUPOS = ("hacktivista", "cibercriminal", "estatal", "desconocido", "reclamo_telegram", "detectado_automaticamente")
 
 
 def _d(s: str) -> date:
@@ -47,13 +49,15 @@ def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio
 
     # Varias noticias del mismo día suelen describir el MISMO ataque (por ejemplo, cinco medios
     # italianos sobre la filtración de licencias de conducir): en el grupo detectado
-    # automáticamente se cuenta un solo evento por día. Los incidentes cargados a mano no se agrupan.
+    # automáticamente se cuenta un solo evento por día (los reclamos de Telegram, aparte: un grupo
+    # suele publicar varios objetivos el mismo día). Los incidentes cargados a mano no se agrupan.
     vistos, depurados = set(), []
     for e in ataques:
         if e.get("origen") != "incidente_csv":
-            if e["dia"] in vistos:
+            clave = (e.get("origen") == "telegram", e["dia"])
+            if clave in vistos:
                 continue
-            vistos.add(e["dia"])
+            vistos.add(clave)
         depurados.append(e)
     ataques = depurados
 
@@ -70,7 +74,10 @@ def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio
 
         grupos = {g: {"n": 0, "dentro": 0, "anticipaciones": [], "ids_dentro": [], "ids_fuera": []} for g in GRUPOS}
         for e in ataques:
-            g = e.get("tipo_actor") if e.get("origen") == "incidente_csv" else "detectado_automaticamente"
+            if e.get("origen") == "incidente_csv":
+                g = e.get("tipo_actor")
+            else:
+                g = "reclamo_telegram" if e.get("origen") == "telegram" else "detectado_automaticamente"
             g = g if g in grupos else "desconocido"
             dia = _d(e["dia"])
             grupos[g]["n"] += 1

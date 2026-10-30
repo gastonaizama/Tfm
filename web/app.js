@@ -10,6 +10,7 @@ const NIVEL_DESC = {
 const ORIGEN_TXT = {
   rss: "RSS", gdelt: "GDELT", gdelt_historico: "GDELT (histórico)",
   hecho_clave: "Hecho clave (manual)", incidente_csv: "Incidente (manual)",
+  telegram: "Telegram (reclamo del grupo, sin verificar)",
 };
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
@@ -259,7 +260,7 @@ function chipsMitre(tecnicas) {
     return `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener" title="${esc(m?.nombre || "")}">${esc(t)}${m ? " · " + esc(m.nombre) : ""}</a>`;
   }).join("");
 }
-const ACTOR_TXT = { hacktivista: "Hacktivista", cibercriminal: "Cibercriminal", estatal: "Estatal", desconocido: "Actor desconocido", detectado_automaticamente: "Detectados en noticias" };
+const ACTOR_TXT = { hacktivista: "Hacktivista", cibercriminal: "Cibercriminal", estatal: "Estatal", desconocido: "Actor desconocido", reclamo_telegram: "Reclamos en Telegram", detectado_automaticamente: "Detectados en noticias" };
 function itemEvento(e) {
   const grupos = (e.grupos || []).map((g) => `<span class="chip">👥 ${esc(g)}</span>`).join("");
   const actor = e.tipo_actor ? `<span class="chip">${esc(ACTOR_TXT[e.tipo_actor] || e.tipo_actor)}</span>` : "";
@@ -276,7 +277,7 @@ function renderEvaluacion() {
   const clave = estado.variante || "todos";
   const ev = variantes.ventanas ? variantes : variantes[clave];
   if (!ev || !ev.ventanas || !ev.ventanas.length) return;
-  const grupos = ["hacktivista", "cibercriminal", "desconocido", "estatal", "detectado_automaticamente"]
+  const grupos = ["hacktivista", "cibercriminal", "desconocido", "estatal", "reclamo_telegram", "detectado_automaticamente"]
     .filter((g) => ev.ventanas.some((v) => v.grupos[g] && v.grupos[g].n));
   const actual = estado.datos.parametros.ventana_vigilancia_dias;
   const celda = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n} (${x.pct_dentro}%)` +

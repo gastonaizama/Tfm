@@ -37,6 +37,8 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Pruebas de las reglas
         run: python -m unittest -v
+      - name: Prueba de los canales de Telegram
+        run: python -m monitor telegram
       - name: Diagnóstico de GDELT
         if: github.event.inputs.diagnostico == 'true'
         run: python -m monitor diagnostico

@@ -50,12 +50,21 @@
       "ripper sec", "anonymous sudan", "mysterious team", "team insane pk"
     ],
 
+    "senales_reclamo": ["down", "tango down", "check-host", "check-host.net", "target", "targets", "targeted", "attacked", "attack", "database", "leak", "leaked", "dump", "dumped", "offline", "hit", "breached"],
     "grupos_hacktivistas": [
       "cyber dragonz", "lulzsec muslims", "lulzsec", "rem", "ripper sec", "anonymous sudan", "mysterious team", "team insane pk"
     ],
 
     "_nota_rem": "REM es una sigla corta y ambigua: solo cuenta como término cibernético si aparece como palabra completa en MAYÚSCULAS (ver 'terminos_sensibles_mayusculas').",
     "terminos_sensibles_mayusculas": ["REM"]
+  },
+
+  "fuentes_telegram": {
+    "_nota": "Canales PÚBLICOS de Telegram leídos desde su vista web (t.me/s/<canal>), sin cuenta. Sus mensajes son reclamos de los propios grupos: un mensaje que menciona a Argentina (o un dominio .ar o la bandera) se trata como ataque reclamado. 'paginas': cuántas páginas de unos 20 mensajes se leen en cada revisión.",
+    "canales": [
+      {"nombre": "LulzSec Muslims", "canal": "Luls_sec_muslims", "paginas": 3, "activa": true},
+      {"nombre": "LulzSec Black", "canal": "LulzSecBlack", "paginas": 3, "activa": true}
+    ]
   },
 
   "fuentes_rss": [

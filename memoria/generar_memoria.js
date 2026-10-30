@@ -226,6 +226,7 @@ add(
     ["La Nación", "Medio argentino", "Funciona (88–89 ítems)"],
     ["GDELT DOC 2.0 API", "Noticias mundiales", "Funciona y tiene historial 2023–2024, pero con límite de uso estricto (HTTP 429 frecuentes)."],
     ["MITRE ATT&CK (STIX)", "Catálogo de técnicas", "Funciona (descarga oficial desde github.com/mitre/cti)."],
+    ["Telegram: LulzSec Muslims y LulzSec Black", "Canales públicos de los grupos (reclamos)", "Agregados el 30/10/2026 (decisión D34); se leen desde la vista web pública, sin cuenta."],
   ], [2300, 2000, 5338]),
   espacio(),
   P("Ninguna fuente tuvo que descartarse. Las direcciones que fallaron se reemplazaron por las alternativas que sí funcionan."),
@@ -237,7 +238,12 @@ add(
   V("Tramos de **2 días** para la consulta geopolítica y de **30 días** para la ciber: 196 consultas en total."),
   V("**Descarga por partes y reanudable:** cada ejecución trabaja como máximo 40 minutos, guarda el progreso y se detiene antes si GDELT rechaza 3 consultas seguidas. Un workflow dedicado la repite cada hora hasta completarla."),
   P("Un diagnóstico posterior confirmó que, para el monitoreo **en vivo**, los feeds RSS son la fuente principal y GDELT es complementario. GDELT aporta su mayor valor en el **análisis histórico**."),
-  H2("5.3. Archivos de carga manual"),
+  H2("5.3. Canales de Telegram de los grupos"),
+  P("Como el hacktivismo se anuncia sobre todo en Telegram, el autor identificó tres espacios: los canales públicos de **LulzSec Muslims** y **LulzSec Black**, y un grupo privado. Se eligió monitorear solo los **canales públicos**, leyendo su vista web (t.me/s/<canal>), la misma que ve cualquier persona sin iniciar sesión. El grupo privado quedó fuera porque exigiría entrar con una cuenta y publicar en un repositorio público contenido de un espacio cerrado (decisión D34)."),
+  V("Un mensaje cuenta como **ataque reclamado** si menciona a Argentina, un dominio .ar o la bandera argentina, y además tiene una señal de ataque (por ejemplo \"down\", un enlace a check-host o un término cibernético)."),
+  V("Es la palabra del propio grupo: se muestra como **reclamo sin verificar** y forma un grupo aparte en la evaluación. Para usarlo como incidente debe pasar por la verificación del autor."),
+  V("Solo se guarda el texto recortado y el enlace al mensaje; nunca archivos ni enlaces de descarga."),
+  H2("5.4. Archivos de carga manual"),
   P("Dado que los grupos hacktivistas anuncian sus ataques mayormente en Telegram o X (fuera del alcance de la Fase 1), se crearon dos archivos CSV editables desde GitHub:"),
   V("`datos/hechos_clave.csv`: 8 hechos geopolíticos de referencia (7 de octubre de 2023, balotaje, asunción presidencial, visita a Israel y anuncio sobre la embajada, fallo AMIA, ataque iraní a Israel, declaración de Hamás como organización terrorista, 30.º aniversario de la AMIA). Están marcados como **no verificados** hasta que el autor confirme fechas y fuentes."),
   V("`datos/incidentes_historicos.csv`: ataques conocidos. Se entregó solo con una fila de ejemplo (que se ignora); **no se inventaron incidentes**. Su carga es la próxima tarea del autor."),
@@ -253,7 +259,7 @@ add(
 
 // 5.4 Búsqueda inicial de incidentes
 add(
-  H2("5.4. Búsqueda inicial de incidentes (pendiente de validación)"),
+  H2("5.5. Búsqueda inicial de incidentes (pendiente de validación)"),
   P("El 13/10/2026 se realizó una búsqueda inicial en fuentes abiertas para identificar ataques del período de estudio. Se consultaron medios argentinos, sitios especializados en inteligencia de amenazas e informes de empresas de seguridad (Radware, Check Point, Group-IB, entre otros). Los resultados son **candidatos**: ninguno se cargó en el archivo de incidentes hasta que el autor los valide."),
   tabla(["Fecha", "Grupo", "Objetivo / tipo", "Fuentes encontradas", "Observaciones"], [
     ["Agosto 2023 (día sin precisar)", "Cyber Dragonz", "Biblioteca del Congreso de la Nación · defacement", "C5N, que cita a mefiltraron.com", "Señalado como el primer ataque al país vinculado al conflicto Israel–Palestina. Fuente secundaria: falta la fecha exacta."],
@@ -287,6 +293,7 @@ add(
   P("Una noticia es de **ataque** si contiene al menos un término cibernético **y** menciona a Argentina (o un dominio `.gob.ar`). Entre los términos están: hackeo, hackers, ciberataque, filtración de datos, defacement, sitio caído, DDoS, hacktivistas, ransomware, gob.ar y los nombres de los grupos (Cyber Dragonz, LulzSec Muslims, REM, Ripper Sec, Anonymous Sudan, Mysterious Team, Team Insane PK)."),
   V("La sigla **REM** solo cuenta si aparece en MAYÚSCULAS, para evitar falsos positivos (por ejemplo, la «fase REM» del sueño)."),
   V("Se descartaron términos demasiado genéricos como «filtración» a secas, que en la prensa argentina se usa mucho para filtraciones políticas."),
+  V("Para los **mensajes de los canales de Telegram de los grupos** rige una regla propia: alcanza con que mencionen a Argentina, un dominio .ar o la bandera y tengan una señal de reclamo (como «down», «leak» o un enlace a check-host), porque el canal ya es el contexto cibernético (sección 5.3)."),
   H2("6.3. Mapeo a MITRE ATT&CK"),
   P("A cada noticia de ataque se le asignan técnicas de la matriz Enterprise ATT&CK según las expresiones que contiene. Los nombres oficiales se descargan de MITRE en cada ejecución."),
   tabla(["Categoría", "Técnicas asignadas"], mapeo.reglas.map((r) => [r.categoria,
@@ -445,6 +452,7 @@ add(
     ["D31", "Un evento por día en noticias detectadas", "Evitar contar varias veces el mismo ataque"],
     ["D32", "Resultados que cambian con el histórico", "Interpretación prudente y recalibración"],
     ["D33", "Incidentes descartados con motivo, fuera del cálculo", "Trazabilidad del análisis"],
+    ["D34", "Canales públicos de Telegram de los grupos como fuente de reclamos", "El hacktivismo se anuncia en Telegram"],
   ], [1100, 4600, 3938]),
 );
 

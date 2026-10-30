@@ -281,6 +281,12 @@
       "tipo": "Decisión",
       "titulo": "INC-022 confirmado como descartado y recalibración postergada",
       "detalle": "El autor confirmó que INC-022 (AFA, código B1) queda descartado por no guardar relación con el Estado argentino. Estado de la carga: 23 incidentes, 17 revisados por el autor (14 en uso y 3 descartados) y 6 sin revisar (INC-009 a INC-013 e INC-023), que solo cuentan en la variante 'todos'. Con la descarga de GDELT en 304 de 623 tramos, la cobertura de la ventana de 21 días llegó a 61,2 %. Una prueba con 3 a 6 fuentes por día como mínimo redujo la cobertura pero dejó afuera de la ventana de 7 días a la mayoría de los hacktivistas. Se decide esperar a que termine la descarga antes de recalibrar el umbral (D32)."
+    },
+    {
+      "fecha": "30/10/2026",
+      "tipo": "Fuentes",
+      "titulo": "Monitoreo de los canales públicos de Telegram (camino A)",
+      "detalle": "El autor compartió tres espacios de Telegram: el canal de LulzSec Muslims, el de LulzSec Black y un grupo privado. Se decidió leer solo los dos canales públicos desde su vista web (sin cuenta), cada 6 horas. Los mensajes que mencionan a Argentina, un dominio .ar o la bandera y tienen una señal de ataque se toman como reclamos sin verificar y forman un grupo aparte en la evaluación (D34). La prueba real se hace desde GitHub Actions, porque el entorno de desarrollo no tiene acceso a Telegram."
     }
   ]
 }
