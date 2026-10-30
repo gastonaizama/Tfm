@@ -390,8 +390,11 @@ function renderMetodologia() {
   const p = estado.datos.parametros;
   const h = estado.datos.historico_gdelt || {};
   $("metodologia").innerHTML = `<p><b>Cómo se calcula el semáforo.</b> Una noticia es <i>geopolítica relevante</i> si menciona a Argentina
-  y sus términos geopolíticos suman al menos ${p.umbral_puntaje_detonante} puntos. Un día es <i>detonante</i> cuando esas noticias aparecen en
-  al menos ${p.min_fuentes_distintas_por_dia} fuentes distintas, o cuando hay un hecho clave cargado a mano. Cada detonante abre una
+  y sus términos geopolíticos suman al menos ${p.umbral_puntaje_detonante} puntos. ${p.modo_detonantes === "automatico"
+    ? `Un día es <i>detonante</i> cuando esas noticias aparecen en al menos ${p.min_fuentes_distintas_por_dia} fuentes distintas, o cuando hay un hecho clave cargado a mano.`
+    : `Un día es <i>detonante</i> solo cuando hay un <b>hecho clave</b> revisado por el analista. Los días con noticias relevantes en al menos
+      ${p.min_fuentes_distintas_por_dia} fuentes distintas se proponen como candidatos para que el analista los revise.`}
+  La plataforma se centra en <b>LulzSec</b>: solo sus ataques cambian el semáforo. Cada detonante abre una
   <i>ventana de vigilancia</i> de ${p.ventana_vigilancia_dias} días (amarillo). Si dentro de la ventana aparece una noticia de ataque
   contra objetivos argentinos, el nivel pasa a rojo hasta que la ventana se cierre. Los ataques fuera de toda ventana se listan como
   alertas informativas para evaluar el modelo.</p>
