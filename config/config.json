@@ -2,7 +2,9 @@
   "_ayuda": "Archivo central de configuración. Se puede editar desde la web de GitHub (icono del lápiz). Los textos se comparan sin tildes y sin distinguir mayúsculas.",
 
   "semaforo": {
-    "ventana_vigilancia_dias": 7,
+    "_nota_modo": "modo_detonantes: 'curado' = solo abren ventana los hechos de datos/hechos_clave.csv; las noticias que antes abrían ventana van a datos/candidatos_hechos_clave.csv para revisión del autor. 'automatico' = comportamiento anterior (noticias de 2 o más fuentes el mismo día).",
+    "modo_detonantes": "curado",
+    "ventana_vigilancia_dias": 21,
     "umbral_puntaje_detonante": 2,
     "min_fuentes_distintas_por_dia": 2,
     "dias_modo_vivo": 30
@@ -101,9 +103,20 @@
   },
 
   "evaluacion": {
-    "_nota": "Tamaños de ventana (días) para el análisis de sensibilidad. La ventana del semáforo es la de 'semaforo.ventana_vigilancia_dias'.",
-    "ventanas_sensibilidad": [3, 7, 14, 21],
-    "inicio": "2023-08-01"
+    "_nota": "Tamaños de ventana (días) para el análisis de sensibilidad. La ventana del semáforo es la de 'semaforo.ventana_vigilancia_dias'. Los tramos separan calibración (donde se ajustaron las reglas) y validación (datos posteriores); 'hoy' se reemplaza por la fecha del día.",
+    "ventanas_sensibilidad": [3, 7, 14, 21, 30],
+    "inicio": "2023-08-01",
+    "tramos": [
+      {"clave": "calibracion", "nombre": "Calibración", "inicio": "2023-08-01", "fin": "2024-12-31"},
+      {"clave": "validacion", "nombre": "Validación", "inicio": "2025-01-01", "fin": "hoy"},
+      {"clave": "total", "nombre": "Total", "inicio": "2023-08-01", "fin": "hoy"}
+    ]
+  },
+
+  "alcance": {
+    "_nota": "Decisión del autor (30/10/2026): la plataforma se centra en LulzSec. En la línea de tiempo, el semáforo y las alertas solo se muestran los ataques de este actor (incidentes cuyo grupo lo nombra, reclamos de sus canales de Telegram y noticias que lo mencionan). Los ataques de otros actores NO se muestran, pero se usan como grupo de comparación en la evaluación.",
+    "actor_foco": "LulzSec",
+    "terminos_actor": ["lulzsec", "lulz sec", "lulzsec muslims", "lulzsec black", "luls_sec_muslims", "lulzsecblack"]
   },
 
   "periodos_web": [

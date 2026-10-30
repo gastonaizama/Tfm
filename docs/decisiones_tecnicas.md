@@ -203,6 +203,24 @@ Formato de cada decisión: **contexto → decisión → motivo → alternativas 
 - **Ética:** solo se guarda el texto recortado del mensaje y su enlace; nunca archivos, imágenes ni enlaces de descarga.
 - **Limitaciones:** cada lectura ve las últimas páginas del canal (unos 60 mensajes); si el canal desactiva la vista pública o es cerrado, la fuente deja de funcionar (se ve en "Estado de las fuentes").
 
+### D35. Detonantes curados, ventana de 21 días y validación por tramos
+- **Contexto (diagnóstico del autor, 30/10/2026):** con la regla automática había 227 días detonantes (agosto 2023 – hoy), porque cualquier noticia que mencionara a Argentina y sumara 2 puntos (por ejemplo, solo "AMIA" o "Irán") abría una ventana. Las ventanas se encadenaban, el semáforo cubría el 51,6 % de los días y la razón de los hacktivistas era 1,16, casi el azar. Al seguir avanzando GDELT, los días detonantes pasaron a 277 y la cobertura, con 7 días, al 63 %.
+- **Decisión (del autor):**
+  1. `semaforo.modo_detonantes = "curado"`: solo abren ventana los hechos de `datos/hechos_clave.csv`. El modo `"automatico"` (comportamiento anterior) queda disponible.
+  2. Las noticias que en modo automático serían detonantes se agregan a `datos/candidatos_hechos_clave.csv` para que el autor las revise: **una fila por día** (elegido por el autor frente a una fila por noticia, que daba unas 1.850 filas), con la noticia de mayor puntaje y la cantidad de noticias y fuentes. Sin duplicar: se omite un día que ya tiene candidato o hecho clave, o una noticia ya listada; los conteos de los candidatos pendientes se actualizan a medida que se completa GDELT.
+  3. `ventana_vigilancia_dias` pasa de 7 a 21. Se mantiene la fusión de ventanas solapadas.
+  4. La evaluación compara ambos modos con ventanas de 3, 7, 14, 21 y 30 días, separada en **calibración** (01/08/2023 – 31/12/2024), **validación** (01/01/2025 – hoy) y total. La web y la memoria muestran esa tabla.
+- **Verificación:** la simulación del autor (16 hechos clave, 5 hacktivistas verificados) dio, para el período completo, 10,2 % / 0 de 5 (7 días), 17,6 % / 1 de 5 (14), 23,3 % / 4 de 5 con razón 3,4 (21) y 29,4 % / 5 de 5 con razón 3,4 (30). La evaluación de la plataforma reproduce esos valores (diferencias de una décima por la fecha de corte).
+- **Consecuencias y límites:**
+  - El semáforo en vivo ya no se enciende solo: depende de que el autor cargue hechos clave. La lista de candidatos es la bandeja de entrada.
+  - Todo el resultado depende de los 16 hechos clave, que **todavía no están verificados**.
+  - El tamaño de la ventana se eligió mirando todo el período. Los 4 ataques de LulzSec son de 2024 (calibración): el tramo de validación no tiene ningún ataque de LulzSec, así que todavía no hay validación fuera de muestra.
+
+### D36. Plataforma centrada en LulzSec; los demás actores, solo como comparación
+- **Decisión del autor (30/10/2026):** la plataforma se dedica a LulzSec (`alcance.actor_foco`). En la línea de tiempo, el semáforo, las alertas y las listas de incidentes sin fecha y descartados solo aparecen ataques de este actor: incidentes cuyo grupo lo nombra, reclamos de sus canales de Telegram y noticias que lo mencionan (`alcance.terminos_actor`).
+- **Comparación:** a propuesta del asistente, y con acuerdo del autor, los ataques de otros actores no se borran: se usan en la evaluación como **grupo de comparación** (otros hacktivistas, cibercriminales, desconocidos). Sin él no se puede distinguir una razón alta de la casualidad.
+- **Consecuencia:** el grupo foco tiene 4 ataques verificados (INC-002, INC-004, INC-005 e INC-006, LulzSec Muslims, todos de 2024). INC-020 (campaña hacktivista sin nombre contra la Cancillería) pasa al grupo "otros hacktivistas".
+
 ## F. Fase 2 (diseño previsto)
 
 ### D25. Modelos y contrato de datos de la IA

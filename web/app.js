@@ -260,7 +260,7 @@ function chipsMitre(tecnicas) {
     return `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener" title="${esc(m?.nombre || "")}">${esc(t)}${m ? " · " + esc(m.nombre) : ""}</a>`;
   }).join("");
 }
-const ACTOR_TXT = { hacktivista: "Hacktivista", cibercriminal: "Cibercriminal", estatal: "Estatal", desconocido: "Actor desconocido", reclamo_telegram: "Reclamos en Telegram", detectado_automaticamente: "Detectados en noticias" };
+const ACTOR_TXT = { lulzsec: "LulzSec (foco)", hacktivista: "Otros hacktivistas", cibercriminal: "Cibercriminal", estatal: "Estatal", desconocido: "Actor desconocido", reclamo_telegram: "Reclamos en Telegram", detectado_automaticamente: "Detectados en noticias" };
 function itemEvento(e) {
   const grupos = (e.grupos || []).map((g) => `<span class="chip">👥 ${esc(g)}</span>`).join("");
   const actor = e.tipo_actor ? `<span class="chip">${esc(ACTOR_TXT[e.tipo_actor] || e.tipo_actor)}</span>` : "";
@@ -277,7 +277,7 @@ function renderEvaluacion() {
   const clave = estado.variante || "todos";
   const ev = variantes.ventanas ? variantes : variantes[clave];
   if (!ev || !ev.ventanas || !ev.ventanas.length) return;
-  const grupos = ["hacktivista", "cibercriminal", "desconocido", "estatal", "reclamo_telegram", "detectado_automaticamente"]
+  const grupos = ["lulzsec", "hacktivista", "cibercriminal", "desconocido", "estatal", "reclamo_telegram", "detectado_automaticamente"]
     .filter((g) => ev.ventanas.some((v) => v.grupos[g] && v.grupos[g].n));
   const actual = estado.datos.parametros.ventana_vigilancia_dias;
   const celda = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n} (${x.pct_dentro}%)` +
@@ -291,15 +291,44 @@ function renderEvaluacion() {
     <p class="metodologia">Período evaluado: ${fechaLarga(ev.inicio)} – ${fechaLarga(ev.fin)} · ${ev.detonantes} días detonantes.
     Cada celda muestra cuántos ataques cayeron <b>dentro</b> de una ventana de vigilancia. La <b>cobertura</b> es el porcentaje de días cubiertos por ventanas,
     es decir, lo esperable por azar. Una <b>razón</b> mayor que 1 significa que ese tipo de actor ataca dentro de las ventanas más de lo esperable por azar.
-    El grupo de comparación son los cibercriminales. «d» es la mediana de días entre el detonante y el ataque.</p>
+    La plataforma se centra en <b>LulzSec</b>: los ataques de otros actores no se muestran en la línea de tiempo ni en el semáforo,
+    pero se usan aquí como <b>grupo de comparación</b> (sobre todo los cibercriminales, que no deberían reaccionar a hechos geopolíticos).
+    «d» es la mediana de días entre el detonante y el ataque.</p>
     <div class="tabla-scroll"><table><thead><tr><th>Ventana</th><th>Cobertura</th>${grupos.map((g) => `<th>${ACTOR_TXT[g]}</th>`).join("")}</tr></thead><tbody>
     ${ev.ventanas.map((v) => `<tr${v.ventana_dias === actual ? ' class="actual"' : ""}><td>${v.ventana_dias} días${v.ventana_dias === actual ? " (semáforo)" : ""}</td>
       <td>${v.cobertura_pct}%</td>${grupos.map((g) => `<td>${celda(v.grupos[g])}</td>`).join("")}</tr>`).join("")}
     </tbody></table></div>
-    <p class="metodologia">⚠️ Resultados preliminares: pocos incidentes y la mayoría sin verificar. Sirven para mostrar el método, no para sacar conclusiones.</p>`;
+    ${htmlComparacion(clave)}
+    <p class="metodologia">⚠️ Resultados preliminares: pocos incidentes y los hechos clave todavía sin verificar. Sirven para mostrar el método, no para sacar conclusiones.</p>`;
   const sel = $("variante-eval");
   if (sel) sel.onchange = () => { estado.variante = sel.value; renderEvaluacion(); };
 }
+// Detonantes automáticos (antes) frente a curados (ahora), por tramo: calibración, validación y total.
+function htmlComparacion(clave) {
+  const comp = (estado.datos.comparacion_modos || {})[clave];
+  if (!comp || !comp.curado) return "";
+  const celda = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n}` + (x.razon !== null ? ` · <b>${x.razon}</b>` : "");
+  const tramos = Object.keys(comp.curado);
+  const filas = tramos.map((t) => {
+    const a = comp.automatico[t], c = comp.curado[t];
+    return c.ventanas.map((vc, i) => {
+      const va = a.ventanas[i];
+      return `<tr${i === 0 ? ' class="inicio-tramo"' : ""}>${i === 0 ? `<th rowspan="${c.ventanas.length}">${esc(c.nombre)}<br><small>${fechaLarga(c.inicio)} – ${fechaLarga(c.fin)}<br>detonantes: ${a.detonantes} → ${c.detonantes}</small></th>` : ""}
+        <td>${vc.ventana_dias} d</td>
+        <td>${va.cobertura_pct}%</td><td>${celda(va.grupos.lulzsec)}</td><td>${celda(va.grupos.cibercriminal)}</td>
+        <td>${vc.cobertura_pct}%</td><td>${celda(vc.grupos.lulzsec)}</td><td>${celda(vc.grupos.cibercriminal)}</td></tr>`;
+    }).join("");
+  }).join("");
+  return `<h3>Antes y después: detonantes automáticos frente a curados</h3>
+    <p class="metodologia"><b>Automático</b> (antes): abre ventana cualquier día con noticias geopolíticas de 2 o más fuentes.
+    <b>Curado</b> (ahora): solo abren ventana los hechos clave revisados por el analista. Cada celda muestra ataques dentro / total · <b>razón</b>.
+    La <b>calibración</b> es el período con el que se ajustaron las reglas; la <b>validación</b> son datos posteriores que no se usaron para ajustarlas.</p>
+    <div class="tabla-scroll"><table class="comparacion"><thead>
+      <tr><th rowspan="2">Tramo</th><th rowspan="2">Ventana</th><th colspan="3">Automático (antes)</th><th colspan="3">Curado (ahora)</th></tr>
+      <tr><th>Cobertura</th><th>LulzSec</th><th>Cibercriminales</th><th>Cobertura</th><th>LulzSec</th><th>Cibercriminales</th></tr>
+    </thead><tbody>${filas}</tbody></table></div>`;
+}
+
 function renderSinFecha() {
   const sf = estado.datos.incidentes_sin_fecha || [];
   const desc = estado.datos.incidentes_descartados || [];

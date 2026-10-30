@@ -15,7 +15,14 @@ noticias de ataques.
   las ventanas MÁS de lo esperable por azar (evidencia a favor de la hipótesis).
 - anticipacion_mediana: días entre el último detonante y el ataque (solo los de dentro).
 
-El grupo de comparación (cibercriminales) debería dar una razón cercana a 1.
+El grupo foco es LulzSec (incidentes cargados a mano cuyo grupo lo nombra, marcados `en_foco`).
+Los demás actores (hacktivistas de otros grupos, cibercriminales, estatales, desconocidos) no se
+muestran en la plataforma, pero se usan aquí como grupo de comparación: los cibercriminales
+deberían dar una razón cercana a 1.
+
+`comparar_modos` repite la evaluación con los detonantes en modo "automatico" y "curado"
+(ver semaforo.py) y por tramos: calibración (el período con el que se ajustaron las reglas),
+validación (datos posteriores, que no se usaron para ajustar) y total.
 
 Con `confianzas` se puede restringir la evaluación a los incidentes cargados a mano con
 cierto nivel de confianza (por ejemplo {"media", "alta"}) para comprobar que las
@@ -28,7 +35,7 @@ from statistics import median
 
 from . import semaforo
 
-GRUPOS = ("hacktivista", "cibercriminal", "estatal", "desconocido", "reclamo_telegram", "detectado_automaticamente")
+GRUPOS = ("lulzsec", "hacktivista", "cibercriminal", "estatal", "desconocido", "reclamo_telegram", "detectado_automaticamente")
 
 
 def _d(s: str) -> date:
@@ -39,7 +46,8 @@ def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio
             confianzas: set[str] | None = None, solo_verificados: bool = False) -> dict:
     ini, fn = _d(inicio), _d(fin)
     total_dias = (fn - ini).days + 1
-    detonantes = semaforo.dias_detonantes(eventos, cfg_semaforo["min_fuentes_distintas_por_dia"])
+    modo = cfg_semaforo.get("modo_detonantes", "curado")
+    detonantes = semaforo.dias_detonantes(eventos, cfg_semaforo["min_fuentes_distintas_por_dia"], modo)
     dias_detonantes = sorted(_d(d) for d in detonantes)
     ataques = [e for e in eventos if e["carril"] == "ataque" and ini <= _d(e["dia"]) <= fn
                and (confianzas is None or e.get("origen") != "incidente_csv"
@@ -75,7 +83,7 @@ def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio
         grupos = {g: {"n": 0, "dentro": 0, "anticipaciones": [], "ids_dentro": [], "ids_fuera": []} for g in GRUPOS}
         for e in ataques:
             if e.get("origen") == "incidente_csv":
-                g = e.get("tipo_actor")
+                g = "lulzsec" if e.get("en_foco") else e.get("tipo_actor")
             else:
                 g = "reclamo_telegram" if e.get("origen") == "telegram" else "detectado_automaticamente"
             g = g if g in grupos else "desconocido"
@@ -104,5 +112,20 @@ def evaluar(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], inicio
                            "periodos": len(periodos), "grupos": salida})
     return {"inicio": ini.isoformat(), "fin": fn.isoformat(), "dias": total_dias,
             "confianzas": sorted(confianzas) if confianzas else "todas",
-            "solo_verificados": solo_verificados,
-            "detonantes": len(dias_detonantes), "ventanas": resultados}
+            "solo_verificados": solo_verificados, "modo_detonantes": modo,
+            "detonantes": sum(1 for d in dias_detonantes if ini <= d <= fn), "ventanas": resultados}
+
+
+def comparar_modos(eventos: list[dict], cfg_semaforo: dict, ventanas: list[int], tramos: list[dict],
+                   hoy: str, **filtros) -> dict:
+    """{modo: {tramo: evaluación}} con los detonantes automáticos y curados, por tramo."""
+    salida = {}
+    for modo in ("automatico", "curado"):
+        cfg = {**cfg_semaforo, "modo_detonantes": modo}
+        salida[modo] = {}
+        for t in tramos:
+            fin = hoy if t["fin"] == "hoy" else t["fin"]
+            r = evaluar(eventos, cfg, ventanas, t["inicio"], fin, **filtros)
+            r["nombre"] = t["nombre"]
+            salida[modo][t["clave"]] = r
+    return salida

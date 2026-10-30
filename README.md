@@ -60,12 +60,18 @@ No hay servidores ni bases de datos. Todo funciona con dos servicios gratuitos d
 
 ### Reglas de la Fase 1 (sin inteligencia artificial)
 
+**Alcance (desde el 30/10/2026):** la plataforma se centra en **LulzSec**. La línea de tiempo, el semáforo y las alertas solo muestran ataques de este actor (incidentes que lo nombran, reclamos de sus canales de Telegram y noticias que lo mencionan). Los ataques de otros actores no se muestran, pero se usan como **grupo de comparación** en la evaluación.
+
 1. **Noticia geopolítica relevante**: menciona a Argentina y sus términos geopolíticos suman **2 puntos o más**. Valen 2 puntos Hamás, Irán, AMIA y Hezbolá; valen 1 punto Israel, Palestina, Gaza, Jerusalén, embajada y ONU. Así, "Argentina e Israel" sola no alcanza, pero "embajada argentina en Jerusalén" sí.
-2. **Día detonante**: hay noticias relevantes de **al menos 2 fuentes distintas** ese día (corroboración), o hay un **hecho clave** cargado a mano.
-3. **Ventana de vigilancia**: cada día detonante abre una ventana de 7 días. Si llega otro detonante con la ventana todavía abierta, la ventana se extiende.
+2. **Día detonante** (`semaforo.modo_detonantes`):
+   - **`curado`** (por defecto): solo abren ventana los **hechos clave** de [`datos/hechos_clave.csv`](datos/hechos_clave.csv), revisados por el analista. Las noticias que antes abrían ventana (relevantes en **al menos 2 fuentes distintas** el mismo día) se proponen como **candidatos** en [`datos/candidatos_hechos_clave.csv`](datos/candidatos_hechos_clave.csv): **una fila por día**, con la noticia de mayor puntaje, su fuente, enlace y puntaje, y la cantidad de noticias y de fuentes. No se repiten días ni noticias, y no se proponen días que ya tienen un hecho clave. El analista los revisa y, si corresponde, los pasa a mano a `hechos_clave.csv`.
+   - **`automatico`**: el comportamiento anterior; también abren ventana los días con noticias relevantes de 2 o más fuentes.
+   - **Motivo del cambio:** con la regla automática, a medida que se completaba GDELT, casi cualquier mención de Argentina junto con AMIA o Irán abría una ventana; las ventanas se encadenaban, cubrían más de la mitad de los días y la razón de los hacktivistas quedaba cerca de 1 (azar). Ver la decisión D35.
+   - **Consecuencia:** en vivo, el semáforo pasa a amarillo cuando el analista carga un hecho clave; la lista de candidatos es la bandeja de entrada de la alerta temprana.
+3. **Ventana de vigilancia**: cada día detonante abre una ventana de **21 días** (antes, 7). Si llega otro detonante con la ventana todavía abierta, la ventana se extiende.
 4. **Noticia de ataque**: contiene un término cibernético (hackeo, filtración de datos, DDoS, hacktivistas, gob.ar, Cyber Dragonz, LulzSec Muslims, REM, etc.) **y** menciona a Argentina.
 5. **Reclamo en Telegram**: un mensaje de los canales públicos de los grupos (LulzSec Muslims, LulzSec Black) cuenta como ataque reclamado si menciona a Argentina, un dominio `.ar` o la bandera 🇦🇷, **y** tiene una señal de ataque (término cibernético, un dominio `.ar`, "down", un enlace a check-host, "leak", etc.). Es lo que el grupo **dice** que hizo: se muestra como "reclamo del grupo, sin verificar".
-6. **Rojo**: aparece un ataque dentro de una ventana abierta. Los ataques fuera de cualquier ventana se muestran como alertas **informativas**, porque sirven para evaluar el modelo.
+6. **Rojo**: aparece un ataque de LulzSec dentro de una ventana abierta. Los ataques fuera de cualquier ventana se muestran como alertas **informativas**, porque sirven para evaluar el modelo.
 
 Todos los números se pueden cambiar en [`config/config.json`](config/config.json).
 

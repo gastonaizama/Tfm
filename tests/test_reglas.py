@@ -8,7 +8,10 @@ from monitor.config import cargar_config, cargar_mapeo_mitre
 
 CFG = cargar_config()
 CLF = Clasificador(CFG, cargar_mapeo_mitre())
-SEM = {"ventana_vigilancia_dias": 7, "min_fuentes_distintas_por_dia": 2}
+# Las pruebas de la regla automática (noticias de 2 o más fuentes) indican el modo explícitamente,
+# porque desde el 30/10/2026 el modo por defecto es "curado".
+SEM = {"ventana_vigilancia_dias": 7, "min_fuentes_distintas_por_dia": 2, "modo_detonantes": "automatico"}
+SEM_CURADO = {**SEM, "modo_detonantes": "curado"}
 
 
 def ev(id_, dia, carril, fuente="X", origen="rss"):
@@ -204,3 +207,104 @@ class TestTelegram(unittest.TestCase):
         g = r["ventanas"][0]["grupos"]
         self.assertEqual(g["reclamo_telegram"]["n"], 1)  # mismo día: cuenta una vez
         self.assertEqual(g["detectado_automaticamente"]["n"], 1)
+
+
+def geo(id_, dia, fuente, puntaje=2, origen="gdelt_historico"):
+    return {**ev(id_, dia, "geo", fuente, origen), "puntaje_geo": puntaje, "titulo": f"Noticia {id_}", "url": f"https://x/{id_}"}
+
+
+class TestModoCurado(unittest.TestCase):
+    def test_noticias_no_abren_ventana(self):
+        evs = [geo("g1", "2024-02-06", "A"), geo("g2", "2024-02-06", "B"), ev("a1", "2024-02-09", "ataque")]
+        self.assertEqual(semaforo.calcular(evs, SEM_CURADO, date(2024, 2, 10))["actual"]["nivel"], "verde")
+        self.assertEqual(semaforo.calcular(evs, SEM, date(2024, 2, 10))["actual"]["nivel"], "rojo")
+
+    def test_hecho_clave_abre_ventana(self):
+        evs = [ev("h", "2024-02-06", "geo", origen="hecho_clave"), ev("a1", "2024-02-09", "ataque")]
+        self.assertEqual(semaforo.calcular(evs, SEM_CURADO, date(2024, 2, 10))["actual"]["nivel"], "rojo")
+
+    def test_curado_es_el_modo_por_defecto(self):
+        sin_modo = {"ventana_vigilancia_dias": 7, "min_fuentes_distintas_por_dia": 2}
+        evs = [geo("g1", "2024-02-06", "A"), geo("g2", "2024-02-06", "B")]
+        self.assertEqual(semaforo.calcular(evs, sin_modo, date(2024, 2, 7))["actual"]["nivel"], "verde")
+        self.assertEqual(CFG["semaforo"]["modo_detonantes"], "curado")
+        self.assertEqual(CFG["semaforo"]["ventana_vigilancia_dias"], 21)
+
+    def test_modo_desconocido_da_error(self):
+        with self.assertRaises(ValueError):
+            semaforo.dias_detonantes([], 2, "otro")
+
+
+class TestCandidatos(unittest.TestCase):
+    EVS = [geo("g1", "2024-05-20", "A", 2), geo("g2", "2024-05-20", "B", 4), geo("g3", "2024-05-20", "B", 3),
+           geo("g4", "2024-05-21", "A", 5),  # una sola fuente: no es candidato
+           ev("h", "2024-05-22", "geo", origen="hecho_clave")]
+
+    def test_un_candidato_por_dia(self):
+        c = semaforo.candidatos_por_dia(self.EVS, 2)
+        self.assertEqual(len(c), 1)
+        self.assertEqual((c[0]["dia"], c[0]["url"], c[0]["puntaje"]), ("2024-05-20", "https://x/g2", 4))
+        self.assertEqual((c[0]["n_noticias"], c[0]["n_fuentes"]), (3, 2))
+
+    def test_envio_al_csv_sin_duplicar(self):
+        import csv
+        import tempfile
+        from pathlib import Path
+        from monitor import historico
+        with tempfile.TemporaryDirectory() as d:
+            ruta = Path(d) / "candidatos.csv"
+            ruta.write_text("id,fecha,titulo,fuente_url,estado_revision\n"
+                            "CHC-01,2024-01-01,Manual,https://manual,cargado (sin verificar)\n", encoding="utf-8")
+            c = semaforo.candidatos_por_dia(self.EVS, 2)
+            self.assertEqual(historico.agregar_candidatos_hechos_clave(c, ruta), 1)
+            self.assertEqual(historico.agregar_candidatos_hechos_clave(c, ruta), 0)  # segunda vez: nada nuevo
+            filas = list(csv.DictReader(open(ruta, encoding="utf-8")))
+            self.assertEqual([f["id"] for f in filas], ["CHC-01", "CHC-A-20240520"])
+            self.assertEqual(filas[0]["titulo"], "Manual")  # la fila manual no se toca
+            self.assertEqual((filas[1]["puntaje"], filas[1]["n_noticias"], filas[1]["n_fuentes"]), ("4", "3", "2"))
+            # Si el histórico suma noticias ese día, se actualizan los conteos del candidato pendiente
+            mas = c[0] | {"n_noticias": 5}
+            self.assertEqual(historico.agregar_candidatos_hechos_clave([mas], ruta), 0)
+            self.assertEqual(list(csv.DictReader(open(ruta, encoding="utf-8")))[1]["n_noticias"], "5")
+            # Un día que ya tiene un hecho clave cargado no se propone
+            self.assertEqual(historico.agregar_candidatos_hechos_clave([c[0] | {"dia": "2024-02-06", "url": "https://y"}], ruta), 0)
+            # Una noticia que ya está en la lista no se repite con otro id
+            otra = c[0] | {"dia": "2024-03-01"}
+            self.assertEqual(historico.agregar_candidatos_hechos_clave([otra], ruta), 0)
+
+
+class TestFocoLulzSec(unittest.TestCase):
+    ALC = CFG["alcance"]
+
+    def test_que_eventos_estan_en_foco(self):
+        from monitor.procesar import en_foco
+        inc = lambda g: {"carril": "ataque", "origen": "incidente_csv", "grupos": [g], "titulo": f"{g} → x"}
+        self.assertTrue(en_foco(inc("LulzSec Muslims"), self.ALC))
+        self.assertFalse(en_foco(inc("RansomHub"), self.ALC))
+        self.assertTrue(en_foco({"carril": "ataque", "origen": "telegram", "titulo": "x"}, self.ALC))
+        self.assertTrue(en_foco({"carril": "ataque", "origen": "rss", "titulo": "LulzSec hackeó un sitio argentino"}, self.ALC))
+        self.assertFalse(en_foco({"carril": "ataque", "origen": "rss", "titulo": "Ransomware en un municipio argentino"}, self.ALC))
+        self.assertTrue(en_foco({"carril": "geo", "origen": "rss", "titulo": "Milei en Israel"}, self.ALC))
+
+    def test_lulzsec_y_comparacion_en_evaluacion(self):
+        from monitor import evaluacion
+        evs = [ev("h", "2024-03-01", "geo", origen="hecho_clave"),
+               {**ev("l", "2024-03-05", "ataque", origen="incidente_csv"), "tipo_actor": "hacktivista", "en_foco": True},
+               {**ev("c", "2024-03-20", "ataque", origen="incidente_csv"), "tipo_actor": "cibercriminal", "en_foco": False}]
+        r = evaluacion.evaluar(evs, SEM_CURADO, [7], "2024-03-01", "2024-03-31")["ventanas"][0]["grupos"]
+        self.assertEqual((r["lulzsec"]["n"], r["lulzsec"]["dentro"]), (1, 1))
+        self.assertEqual((r["cibercriminal"]["n"], r["cibercriminal"]["dentro"]), (1, 0))
+        self.assertEqual(r["hacktivista"]["n"], 0)
+
+    def test_comparar_modos_por_tramo(self):
+        from monitor import evaluacion
+        evs = [geo("g1", "2024-02-06", "A"), geo("g2", "2024-02-06", "B"),
+               {**ev("l", "2024-02-09", "ataque", origen="incidente_csv"), "tipo_actor": "hacktivista", "en_foco": True}]
+        tramos = [{"clave": "cal", "nombre": "Calibración", "inicio": "2024-01-01", "fin": "2024-06-30"},
+                  {"clave": "val", "nombre": "Validación", "inicio": "2024-07-01", "fin": "hoy"}]
+        r = evaluacion.comparar_modos(evs, SEM, [7], tramos, "2024-12-31")
+        self.assertEqual(set(r), {"automatico", "curado"})
+        self.assertEqual(r["automatico"]["cal"]["ventanas"][0]["grupos"]["lulzsec"]["dentro"], 1)
+        self.assertEqual(r["curado"]["cal"]["ventanas"][0]["grupos"]["lulzsec"]["dentro"], 0)
+        self.assertEqual(r["curado"]["val"]["fin"], "2024-12-31")  # "hoy" se reemplaza
+        self.assertEqual(r["automatico"]["val"]["ventanas"][0]["grupos"]["lulzsec"]["n"], 0)

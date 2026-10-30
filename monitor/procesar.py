@@ -9,6 +9,7 @@ from .config import (ARCHIVO_ESTADO_FUENTES, ARCHIVO_GDELT_HIST, ARCHIVO_NOTICIA
                      cargar_mapeo_mitre, guardar_json, leer_json)
 from .fuentes import gdelt, rss, telegram
 from .ia import integracion as ia
+from .texto import buscar_terminos, normalizar
 
 
 def _id(url: str, titulo: str) -> str:
@@ -106,6 +107,21 @@ def construir_eventos(noticias: list[dict], clasificador: Clasificador) -> list[
     return eventos
 
 
+def en_foco(e: dict, alcance: dict) -> bool:
+    """¿El evento pertenece al actor foco de la plataforma (LulzSec)?
+
+    Los eventos geopolíticos siempre se muestran. Un ataque está en foco si es un reclamo de los
+    canales de Telegram del actor, o si el grupo del incidente o el texto de la noticia lo nombran.
+    """
+    if not alcance or e.get("carril") != "ataque":
+        return True
+    if e.get("origen") == "telegram":
+        return True
+    texto = normalizar(" ".join([*e.get("grupos", []), e.get("titulo", "")] +
+                                ([e.get("resumen", "")] if e.get("origen") != "incidente_csv" else [])))
+    return bool(buscar_terminos(texto, alcance.get("terminos_actor", [])))
+
+
 def _estado_historico() -> dict:
     h = leer_json(ARCHIVO_GDELT_HIST, {})
     tramos = h.get("tramos", [])
@@ -127,24 +143,36 @@ def ejecutar(recolectar_en_vivo: bool = True) -> dict:
         nuevas = []
     vivo = actualizar_almacen(nuevas, clasificador, config)
     eventos = construir_eventos(vivo + historico.cargar_gdelt_historico(), clasificador)
+    # Alcance (decisión del autor, 30/10/2026): la plataforma muestra solo los ataques de LulzSec.
+    # Los demás se conservan únicamente como grupo de comparación de la evaluación.
+    alcance = config.get("alcance", {})
+    for e in eventos:
+        e["en_foco"] = en_foco(e, alcance)
+    eventos_web = [e for e in eventos if e["en_foco"]]
+
+    # Modo curado: las noticias que en modo automático serían detonantes se proponen como candidatos.
+    nuevos = historico.agregar_candidatos_hechos_clave(
+        semaforo.candidatos_por_dia(eventos, config["semaforo"]["min_fuentes_distintas_por_dia"]))
+    print(f"[Candidatos] {nuevos} días nuevos propuestos en datos/candidatos_hechos_clave.csv")
 
     tecnicas = {t for r in mapeo["reglas"] for t in r["tecnicas"]} | {t for e in eventos for t in e.get("tecnicas", [])}
     catalogo = mitre.actualizar_catalogo(tecnicas)
 
     hoy = datetime.now(timezone.utc).date()
-    resultado = semaforo.calcular(eventos, config["semaforo"], hoy)
+    resultado = semaforo.calcular(eventos_web, config["semaforo"], hoy)
 
     cfg_eval = config.get("evaluacion", {})
     ventanas = cfg_eval.get("ventanas_sensibilidad", [config["semaforo"]["ventana_vigilancia_dias"]])
     inicio_eval = cfg_eval.get("inicio", config["historico"]["inicio"])
-    # Dos variantes: con todos los incidentes y solo con los de confianza media o alta (robustez)
-    resultado_eval = {
-        "todos": evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval, hoy.isoformat()),
-        "confianza_media_alta": evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval,
-                                                   hoy.isoformat(), confianzas={"media", "alta"}),
-        "verificados": evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval,
-                                          hoy.isoformat(), solo_verificados=True),
-    }
+    # Tres variantes: todos los incidentes, solo confianza media o alta, y solo verificados (robustez).
+    # La evaluación usa TODOS los eventos: los actores fuera de foco son el grupo de comparación.
+    variantes = {"todos": {}, "confianza_media_alta": {"confianzas": {"media", "alta"}},
+                 "verificados": {"solo_verificados": True}}
+    resultado_eval = {v: evaluacion.evaluar(eventos, config["semaforo"], ventanas, inicio_eval, hoy.isoformat(), **f)
+                      for v, f in variantes.items()}
+    comparacion = {v: evaluacion.comparar_modos(eventos, config["semaforo"], ventanas, cfg_eval.get("tramos", []),
+                                                hoy.isoformat(), **f)
+                   for v, f in variantes.items()}
 
     # Fase 2 (desactivada por defecto): clasificación con Haiku e informe con Sonnet.
     informe = ia.procesar_si_esta_activada(config, eventos, resultado)
@@ -159,17 +187,22 @@ def ejecutar(recolectar_en_vivo: bool = True) -> dict:
         "periodos": resultado["periodos"],
         "alertas": resultado["alertas"],
         "serie_diaria": resultado["serie_diaria"],
-        "eventos": eventos,
+        "eventos": eventos_web,
+        "alcance": {"actor_foco": alcance.get("actor_foco"),
+                    "ataques_fuera_de_foco": sum(1 for e in eventos if not e["en_foco"])},
         "mitre": catalogo,
         "fuentes": leer_json(ARCHIVO_ESTADO_FUENTES, {}),
         "historico_gdelt": _estado_historico(),
         "evaluacion": resultado_eval,
-        "incidentes_sin_fecha": historico.cargar_incidentes_sin_fecha(),
-        "incidentes_descartados": historico.cargar_incidentes_descartados(),
+        "comparacion_modos": comparacion,
+        "incidentes_sin_fecha": [e for e in historico.cargar_incidentes_sin_fecha() if en_foco(e, alcance)],
+        "incidentes_descartados": [e for e in historico.cargar_incidentes_descartados() if en_foco(e, alcance)],
         "informe_ia": informe,
     }
     guardar_json(ARCHIVO_SALIDA_WEB, salida, compacto=True)
-    n_geo = sum(e["carril"] == "geo" for e in eventos)
+    n_geo = sum(e["carril"] == "geo" for e in eventos_web)
     print(f"[Resultado] Nivel actual: {resultado['actual']['nivel'].upper()} | "
-          f"eventos geo: {n_geo} | ataques: {len(eventos) - n_geo} | periodos: {len(resultado['periodos'])}")
+          f"eventos geo: {n_geo} | ataques de {alcance.get('actor_foco', 'todos')}: {len(eventos_web) - n_geo} | "
+          f"fuera de foco (solo comparación): {salida['alcance']['ataques_fuera_de_foco']} | "
+          f"periodos: {len(resultado['periodos'])}")
     return salida
