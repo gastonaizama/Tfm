@@ -54,6 +54,19 @@ def parsear_pagina(contenido: str, canal: dict) -> list[dict]:
     return mensajes
 
 
+def describir_pagina(contenido: str, url_final: str) -> str:
+    """Explica por qué una página no tiene mensajes (para el diagnóstico de la fuente)."""
+    titulo = re.search(r'<meta property="og:title" content="([^"]*)"', contenido)
+    titulo = html.unescape(titulo.group(1)) if titulo else "sin título"
+    if "/s/" not in url_final:
+        motivo = "Telegram redirigió fuera de la vista pública (el canal no la tiene activada, es privado o no existe)"
+    elif "tgme_channel_info" in contenido:
+        motivo = "el canal existe pero no muestra mensajes de texto"
+    else:
+        motivo = "la página no tiene el formato de un canal público"
+    return f"{motivo}; título de la página: «{titulo}»; dirección final: {url_final}"[:300]
+
+
 def leer_canal(canal: dict) -> tuple[list[dict], dict]:
     """Lee las últimas páginas del canal. Nunca lanza excepción: un canal caído no detiene el resto."""
     url = f"https://t.me/s/{canal['canal']}"
@@ -66,6 +79,8 @@ def leer_canal(canal: dict) -> tuple[list[dict], dict]:
             r.raise_for_status()
             pagina = parsear_pagina(r.text, canal)
             if not pagina:
+                if not mensajes:
+                    diag["detalle_pagina"] = describir_pagina(r.text, r.url)
                 break
             mensajes.extend(pagina)
             antes = min(m["numero_mensaje"] for m in pagina)
@@ -75,7 +90,7 @@ def leer_canal(canal: dict) -> tuple[list[dict], dict]:
                 vistos.add(m["url"])
                 unicos.append(m)
         diag.update(ok=len(unicos) > 0, items=len(unicos),
-                    detalle="" if unicos else "sin mensajes visibles (¿canal sin vista pública o cerrado?)")
+                    detalle="" if unicos else "sin mensajes visibles: " + diag.get("detalle_pagina", ""))
         return unicos, diag
     except Exception as ex:
         diag["detalle"] = f"{type(ex).__name__}: {ex}"[:300]
