@@ -316,6 +316,12 @@
       "tipo": "Resultado",
       "titulo": "Antes y después de los detonantes curados",
       "detalle": "Solo verificados, período completo: con la regla automática (277 días detonantes) la ventana de 21 días cubría el 80,5 % de los días y LulzSec tenía razón 1,24. Con los 16 hechos clave curados la cobertura baja al 23,2 %, LulzSec queda 3 de 4 dentro (razón 3,24) y los cibercriminales 1 de 6 (razón 0,72). Coincide con la simulación del autor. Límite: no hay ataques de LulzSec en el tramo de validación y los hechos clave aún no están verificados."
+    },
+    {
+      "fecha": "31/10/2026",
+      "tipo": "Configuración",
+      "titulo": "Pull Request #6 fusionado",
+      "detalle": "El autor fusionó el PR con Telegram como fuente de reclamos, el foco en LulzSec y los detonantes curados con ventana de 21 días. La página pública pasa a mostrar solo los ataques de LulzSec."
     }
   ]
 }
