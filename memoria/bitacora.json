@@ -50,6 +50,11 @@
       "version": "0.9",
       "fecha": "30/10/2026",
       "cambios": "Telegram como fuente de reclamos (D34); plataforma centrada en LulzSec con los demás actores como comparación (D36); detonantes curados, ventana de 21 días y evaluación por tramos de calibración y validación (D35)."
+    },
+    {
+      "version": "0.10",
+      "fecha": "31/10/2026",
+      "cambios": "Perfil del actor LulzSec Muslims en la página web."
     }
   ],
   "eventos": [
@@ -316,6 +321,12 @@
       "tipo": "Resultado",
       "titulo": "Antes y después de los detonantes curados",
       "detalle": "Solo verificados, período completo: con la regla automática (277 días detonantes) la ventana de 21 días cubría el 80,5 % de los días y LulzSec tenía razón 1,24. Con los 16 hechos clave curados la cobertura baja al 23,2 %, LulzSec queda 3 de 4 dentro (razón 3,24) y los cibercriminales 1 de 6 (razón 0,72). Coincide con la simulación del autor. Límite: no hay ataques de LulzSec en el tramo de validación y los hechos clave aún no están verificados."
+    },
+    {
+      "fecha": "31/10/2026",
+      "tipo": "Web",
+      "titulo": "Perfil del actor: LulzSec Muslims",
+      "detalle": "Nueva sección de la página, debajo del semáforo, con la ficha del actor: quién es, motivación, objetivos en Argentina, técnicas MITRE (T1213, T1567, T1491.002, T1485), historial de sus 4 ataques con el hecho clave previo y los días transcurridos, el resultado de la evaluación con la ventana del semáforo (3 de 4 dentro, razón 3,24) y las limitaciones. El historial y el resultado se calculan desde datos.json."
     }
   ]
 }

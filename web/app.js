@@ -57,7 +57,7 @@ async function iniciar() {
   };
   $("ver-info").onchange = renderAlertas;
   let t; window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(dibujarLinea, 150); });
-  renderFuentes(); renderMetodologia(); renderInforme(); renderEvaluacion(); renderSinFecha();
+  renderFuentes(); renderMetodologia(); renderInforme(); renderPerfil(); renderEvaluacion(); renderSinFecha();
   modoVivo();
 }
 
@@ -269,6 +269,56 @@ function itemEvento(e) {
     ? `<span class="chip chip-ok" title="Verificado por el analista (Código Almirantazgo: fiabilidad de la fuente A-F y credibilidad 1-6)">✔ verificado${e.codigo_almirantazgo ? " · " + esc(e.codigo_almirantazgo) : ""}</span>`
     : `<span class="chip" title="Pendiente de verificación por el analista">sin verificar</span>`;
   return `<li>${enlace(e.url, e.titulo)} <span class="fecha">— ${esc(e.fuente)} · ${ORIGEN_TXT[e.origen] || e.origen}</span> ${actor}${grupos}${aprox}${verif}${chipsMitre(e.tecnicas)}</li>`;
+}
+
+// ---------- perfil del actor en foco (LulzSec Muslims) ----------
+// Lo descriptivo es fijo; el historial y el resultado se calculan desde datos.json.
+const PERFIL_TECNICAS = ["T1213", "T1567", "T1491.002", "T1485"];
+const TIPO_ATAQUE_TXT = { filtracion: "Filtración de datos", defacement: "Desfiguración / borrado", ddos: "DDoS", ransomware: "Ransomware", otro: "Otro" };
+function renderPerfil() {
+  const d = estado.datos;
+  const esLulz = (e) => (e.grupos || []).some((g) => /lulz/i.test(g));
+  const ataques = d.eventos.filter((e) => e.origen === "incidente_csv" && esLulz(e)).sort((a, b) => a.dia.localeCompare(b.dia));
+  const hechos = d.eventos.filter((e) => e.origen === "hecho_clave").sort((a, b) => a.dia.localeCompare(b.dia));
+  const ventana = d.parametros.ventana_vigilancia_dias;
+  const previo = (dia) => hechos.filter((h) => h.dia <= dia).pop();
+  const tipo = (e) => { const m = (e.titulo || "").match(/\(([^()]+)\)\s*$/); return m ? (TIPO_ATAQUE_TXT[m[1]] || m[1]) : "—"; };
+  const objetivo = (e) => (e.titulo || "").replace(/^.*?→\s*/, "").replace(/\s*\([^()]+\)\s*$/, "");
+  const filas = ataques.map((e) => {
+    const h = previo(e.dia);
+    const dias = h ? difDias(h.dia, e.dia) : null;
+    const dentro = dias !== null && dias <= ventana;
+    const PREC = { aproximada: "fecha aproximada", mes: "solo se conoce el mes" };
+    const fecha = (e.fecha_precision === "mes" ? fechaLarga(e.dia).replace(/^\d+ /, "") : fechaLarga(e.dia)) +
+      (e.fecha_precision && e.fecha_precision !== "dia" ? ` <small>(${esc(PREC[e.fecha_precision] || e.fecha_precision)})</small>` : "");
+    return `<tr><td>${fecha}</td><td>${esc(objetivo(e))}</td><td>${esc(tipo(e))}</td>
+      <td>${enlace(e.url, e.fuente)}${e.codigo_almirantazgo ? `<br><small>Almirantazgo ${esc(e.codigo_almirantazgo)}</small>` : ""}</td>
+      <td>${h ? `${esc(h.titulo)}<br><small>${fechaLarga(h.dia)} · <b class="${dentro ? "dentro" : "fuera"}">${plural(dias, "día", "días")} después${dentro ? "" : " (fuera de la ventana)"}</b></small>` : "—"}</td></tr>`;
+  }).join("");
+
+  // Resultado con la ventana del semáforo, tomado de la evaluación (solo verificados si existe esa variante).
+  const ev = d.evaluacion?.verificados || d.evaluacion?.todos || d.evaluacion;
+  const v = ev?.ventanas?.find((x) => x.ventana_dias === ventana);
+  const g = v?.grupos?.lulzsec;
+  const resultado = g && g.n
+    ? `<p class="perfil-resultado"><b>${g.dentro} de ${g.n}</b> ataques ocurrieron dentro de una ventana de ${ventana} días posterior a un hecho clave.
+       Esas ventanas cubren el <b>${v.cobertura_pct}%</b> de los días del período: razón <b>${g.razon}</b> (1 = lo esperable por azar).</p>` : "";
+
+  $("perfil-contenido").innerHTML = `
+    <dl class="perfil">
+      <dt>Quién es</dt><dd>Grupo hacktivista pro-Palestina que reivindica sus ataques en canales de Telegram.</dd>
+      <dt>Motivación declarada</dt><dd>Represalia contra los países que apoyan a Israel.</dd>
+      <dt>Objetivos en Argentina</dt><dd>Fuerzas Armadas, fuerzas de seguridad y organismos públicos.</dd>
+      <dt>Técnicas (MITRE ATT&amp;CK)</dt><dd class="chips">${chipsMitre(PERFIL_TECNICAS)}</dd>
+    </dl>
+    ${resultado}
+    <h3>Historial de ataques contra Argentina</h3>
+    <div class="tabla-scroll"><table class="perfil-tabla"><thead><tr><th>Fecha</th><th>Objetivo</th><th>Tipo</th><th>Fuente</th><th>Hecho clave previo</th></tr></thead>
+      <tbody>${filas || `<tr><td colspan="5">Sin incidentes cargados.</td></tr>`}</tbody></table></div>
+    <p class="metodologia"><b>Limitaciones:</b> pocos casos (${ataques.length}); son ataques reivindicados por el grupo, sin confirmación oficial;
+      no hay incidentes del grupo contra Argentina después de ${ataques.length ? fechaLarga(ataques[ataques.length - 1].dia).replace(/^\d+ /, "") : "—"}.
+      <b>Método:</b> fuentes secundarias (medios e informes) y lectura pasiva de la vista pública de canales de Telegram, sin cuenta ni interacción.
+      El canal de LulzSec Muslims no ofrece vista pública; el de LulzSec Black sí.</p>`;
 }
 
 // ---------- evaluación del modelo ----------

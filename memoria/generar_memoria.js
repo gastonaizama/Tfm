@@ -341,6 +341,8 @@ add(
   ...figura("web_vivo.png", "Modo en vivo (últimos 30 días): semáforo, línea de tiempo y alertas. Datos reales de la primera revisión, 12/10/2026."),
   H2("8.1. Componentes"),
   V("**Semáforo:** nivel actual (o el nivel en la fecha final del rango, en modo histórico) y resumen del período: cantidad de hechos, ataques, días en amarillo y en rojo, y nivel máximo."),
+  V("**Perfil del actor:** ficha de LulzSec Muslims (desde el 31/10/2026) con quién es, motivación declarada, objetivos en Argentina y técnicas MITRE ATT&CK. Incluye el historial de ataques contra Argentina, generado desde los incidentes cargados, con el hecho clave previo y los días transcurridos; el resultado de la evaluación con la ventana del semáforo; y las limitaciones y el método de recolección."),
+  ...figura("web_perfil_actor.png", "Sección «Perfil del actor» (31/10/2026): 3 de los 4 ataques de LulzSec Muslims ocurrieron dentro de los 21 días posteriores a un hecho clave."),
   V("**Línea de tiempo:** carril superior con hechos geopolíticos (barras por día) y carril inferior con ataques. Los rombos marcan datos cargados a mano; las bandas sombreadas son las ventanas de vigilancia; la franja central muestra el nivel de cada día. Al pasar el mouse por un día se ve un resumen, y con un clic se ven todas sus noticias."),
   V("**Alertas:** lista con nivel, fechas, noticias relacionadas, grupos detectados y técnicas MITRE, con enlaces a la fuente y a ATT&CK. Un interruptor muestra u oculta las alertas informativas."),
   V("**Selector de fechas:** permite pasar del modo en vivo al histórico; dos botones cargan el caso de estudio (ago 2023 – jul 2024) y el período completo (ago 2023 – hoy)."),
