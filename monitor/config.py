@@ -11,6 +11,7 @@ ARCHIVO_NOTICIAS = DIR_DATOS / "noticias_vivo.json"        # archivo propio que 
 ARCHIVO_GDELT_HIST = DIR_DATOS / "gdelt_historico.json"     # se genera una sola vez (modo histórico)
 ARCHIVO_INCIDENTES = DIR_DATOS / "incidentes_historicos.csv"
 ARCHIVO_HECHOS = DIR_DATOS / "hechos_clave.csv"
+ARCHIVO_CANDIDATOS_HECHOS = DIR_DATOS / "candidatos_hechos_clave.csv"
 ARCHIVO_MITRE = DIR_DATOS / "mitre_tecnicas.json"
 ARCHIVO_ESTADO_FUENTES = DIR_DATOS / "estado_fuentes.json"
 ARCHIVO_SALIDA_WEB = DIR_WEB / "datos.json"                 # lo que lee la página

@@ -11,7 +11,7 @@ import os
 import time
 from datetime import date, timedelta
 
-from .config import ARCHIVO_GDELT_HIST, ARCHIVO_HECHOS, ARCHIVO_INCIDENTES, guardar_json, leer_json
+from .config import ARCHIVO_CANDIDATOS_HECHOS, ARCHIVO_GDELT_HIST, ARCHIVO_HECHOS, ARCHIVO_INCIDENTES, guardar_json, leer_json
 from .fuentes import gdelt
 
 
@@ -38,6 +38,56 @@ def cargar_hechos_clave() -> list[dict]:
         "confianza": f.get("confianza", ""),
         "verificado": f.get("verificado", ""),
     } for f in _leer_csv(ARCHIVO_HECHOS)]
+
+
+COLUMNAS_CANDIDATOS = ["id", "fecha", "fecha_precision", "titulo", "descripcion", "categoria", "fuente_nombre",
+                       "fuente_url", "confianza", "estado_revision", "nota_revision", "puntaje", "n_noticias", "n_fuentes"]
+PENDIENTE_AUTOMATICO = "pendiente (propuesto automáticamente)"
+
+
+def agregar_candidatos_hechos_clave(candidatos: list[dict], ruta=ARCHIVO_CANDIDATOS_HECHOS) -> int:
+    """Agrega a datos/candidatos_hechos_clave.csv un candidato por día (ver semaforo.candidatos_por_dia).
+
+    Sin duplicar: se omite el día si ya tiene un candidato automático, si su noticia ya está en la
+    lista o si ese día ya hay un hecho clave cargado. De los candidatos todavía pendientes se
+    actualiza la cantidad de noticias y fuentes (crece a medida que se completa el histórico).
+    Las filas cargadas o revisadas a mano no se tocan. Devuelve cuántos candidatos nuevos agregó.
+    """
+    filas = []
+    if ruta.exists():
+        with open(ruta, encoding="utf-8-sig", newline="") as f:
+            filas = list(csv.DictReader(f))
+    por_id = {f["id"]: f for f in filas}
+    urls = {f.get("fuente_url", "") for f in filas} - {""}
+    dias_hechos = {h["fecha"] for h in _leer_csv(ARCHIVO_HECHOS)}
+    nuevos, cambios = 0, 0
+    for c in candidatos:
+        cid = f"CHC-A-{c['dia'].replace('-', '')}"
+        if cid in por_id:
+            fila = por_id[cid]
+            if fila.get("estado_revision") == PENDIENTE_AUTOMATICO and \
+                    (fila.get("n_noticias"), fila.get("n_fuentes")) != (str(c["n_noticias"]), str(c["n_fuentes"])):
+                fila.update(n_noticias=str(c["n_noticias"]), n_fuentes=str(c["n_fuentes"]),
+                            nota_revision=f"{c['n_noticias']} noticias de {c['n_fuentes']} fuentes ese día")
+                cambios += 1
+            continue
+        if c["url"] in urls or c["dia"] in dias_hechos:
+            continue
+        fila = {"id": cid, "fecha": c["dia"], "fecha_precision": "dia", "titulo": c["titulo"], "descripcion": "",
+                "categoria": "", "fuente_nombre": c["fuente"], "fuente_url": c["url"], "confianza": "",
+                "estado_revision": PENDIENTE_AUTOMATICO,
+                "nota_revision": f"{c['n_noticias']} noticias de {c['n_fuentes']} fuentes ese día",
+                "puntaje": str(c["puntaje"]), "n_noticias": str(c["n_noticias"]), "n_fuentes": str(c["n_fuentes"])}
+        filas.append(fila)
+        por_id[cid] = fila
+        urls.add(c["url"])
+        nuevos += 1
+    if nuevos or cambios or (filas and list(filas[0].keys()) != COLUMNAS_CANDIDATOS):
+        with open(ruta, "w", encoding="utf-8", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=COLUMNAS_CANDIDATOS, extrasaction="ignore")
+            w.writeheader()
+            w.writerows({k: f.get(k, "") or "" for k in COLUMNAS_CANDIDATOS} for f in filas)
+    return nuevos
 
 
 TIPOS_ACTOR = ("hacktivista", "cibercriminal", "estatal", "desconocido")

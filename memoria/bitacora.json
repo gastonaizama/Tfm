@@ -45,6 +45,11 @@
       "version": "0.8",
       "fecha": "18/10/2026",
       "cambios": "Verificación de los incidentes hacktivistas: 4 verificados (fiabilidad D) y 2 descartados; resultados con la variante 'solo verificados'."
+    },
+    {
+      "version": "0.9",
+      "fecha": "30/10/2026",
+      "cambios": "Telegram como fuente de reclamos (D34); plataforma centrada en LulzSec con los demás actores como comparación (D36); detonantes curados, ventana de 21 días y evaluación por tramos de calibración y validación (D35)."
     }
   ],
   "eventos": [
@@ -275,6 +280,42 @@
       "tipo": "Verificación",
       "titulo": "INC-022 descartado",
       "detalle": "El autor descartó INC-022 (hackers de origen egipcio contra la AFA) por no guardar relación con el Estado argentino. Con esto quedan verificados todos los incidentes hacktivistas con fecha."
+    },
+    {
+      "fecha": "23/10/2026",
+      "tipo": "Decisión",
+      "titulo": "INC-022 confirmado como descartado y recalibración postergada",
+      "detalle": "El autor confirmó que INC-022 (AFA, código B1) queda descartado por no guardar relación con el Estado argentino. Estado de la carga: 23 incidentes, 17 revisados por el autor (14 en uso y 3 descartados) y 6 sin revisar (INC-009 a INC-013 e INC-023), que solo cuentan en la variante 'todos'. Con la descarga de GDELT en 304 de 623 tramos, la cobertura de la ventana de 21 días llegó a 61,2 %. Una prueba con 3 a 6 fuentes por día como mínimo redujo la cobertura pero dejó afuera de la ventana de 7 días a la mayoría de los hacktivistas. Se decide esperar a que termine la descarga antes de recalibrar el umbral (D32)."
+    },
+    {
+      "fecha": "30/10/2026",
+      "tipo": "Fuentes",
+      "titulo": "Monitoreo de los canales públicos de Telegram (camino A)",
+      "detalle": "El autor compartió tres espacios de Telegram: el canal de LulzSec Muslims, el de LulzSec Black y un grupo privado. Se decidió leer solo los dos canales públicos desde su vista web (sin cuenta), cada 6 horas. Los mensajes que mencionan a Argentina, un dominio .ar o la bandera y tienen una señal de ataque se toman como reclamos sin verificar y forman un grupo aparte en la evaluación (D34). La prueba real se hace desde GitHub Actions, porque el entorno de desarrollo no tiene acceso a Telegram."
+    },
+    {
+      "fecha": "30/10/2026",
+      "tipo": "Fuentes",
+      "titulo": "Prueba real de Telegram desde GitHub",
+      "detalle": "LulzSec Black se lee bien (49 mensajes del 27 al 30/10, ninguno sobre Argentina). LulzSec Muslims existe (título «LULZSEC MUSLIM'S») pero Telegram no ofrece su vista pública. El autor decidió dejarlo activo: figura como falla con el motivo y se leerá solo si algún día activan la vista pública."
+    },
+    {
+      "fecha": "30/10/2026",
+      "tipo": "Decisión",
+      "titulo": "Plataforma centrada en LulzSec",
+      "detalle": "El autor decidió que la plataforma sea solo de LulzSec. Los ataques de otros actores dejan de mostrarse en la línea de tiempo, el semáforo y las alertas, pero se conservan como grupo de comparación de la evaluación (D36). Quedan 4 ataques de LulzSec verificados, todos de 2024."
+    },
+    {
+      "fecha": "30/10/2026",
+      "tipo": "Semáforo",
+      "titulo": "Detonantes curados y ventana de 21 días",
+      "detalle": "A pedido del autor, solo los hechos clave abren ventana (modo 'curado'); las noticias que antes eran detonantes se proponen como candidatos, una fila por día (261 días propuestos). La ventana pasa de 7 a 21 días. La evaluación compara los modos automático y curado con ventanas de 3 a 30 días, en tramos de calibración (2023-2024) y validación (2025-hoy) (D35)."
+    },
+    {
+      "fecha": "30/10/2026",
+      "tipo": "Resultado",
+      "titulo": "Antes y después de los detonantes curados",
+      "detalle": "Solo verificados, período completo: con la regla automática (277 días detonantes) la ventana de 21 días cubría el 80,5 % de los días y LulzSec tenía razón 1,24. Con los 16 hechos clave curados la cobertura baja al 23,2 %, LulzSec queda 3 de 4 dentro (razón 3,24) y los cibercriminales 1 de 6 (razón 0,72). Coincide con la simulación del autor. Límite: no hay ataques de LulzSec en el tramo de validación y los hechos clave aún no están verificados."
     }
   ]
 }

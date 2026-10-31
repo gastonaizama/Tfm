@@ -177,7 +177,7 @@ add(
     ["Fuentes", "GDELT (API de documentos, con historial); RSS de The Record, BleepingComputer, The Hacker News, WeLiveSecurity (ESET), Infobae y La Nación; MITRE ATT&CK."],
     ["Palabras clave geopolíticas", "Argentina junto con Israel, Palestina, Hamás, Irán, embajada, AMIA, ONU."],
     ["Palabras clave cibernéticas", "hackeo, filtración de datos, ataque a sitio web, sitio caído, hacktivistas, gob.ar, Cyber Dragonz, LulzSec Muslims, REM."],
-    ["Semáforo", "Verde: sin detonantes. Amarillo: hecho detonante, ventana de 7 días (configurable). Rojo: ataques contra objetivos argentinos dentro de la ventana."],
+    ["Semáforo", "Verde: sin detonantes. Amarillo: hecho detonante, ventana de 7 días (configurable). Rojo: ataques contra objetivos argentinos dentro de la ventana. (Desde el 30/10/2026: ventana de 21 días, detonantes curados y foco en LulzSec; ver capítulo 7.)"],
     ["Pantalla", "Una sola página: semáforo arriba, línea de tiempo con dos carriles en el centro, lista de alertas abajo, selector de fechas (vivo / histórico)."],
     ["Modo histórico", "Agosto 2023 – julio 2024 con GDELT + archivo de incidentes cargados a mano."],
     ["Fases", "Fase 1 sin IA (reglas). Fase 2: Claude Haiku 5.5 clasifica y Claude Sonnet 5.5 redacta un informe solo con alerta; API key como secreto de GitHub."],
@@ -226,6 +226,7 @@ add(
     ["La Nación", "Medio argentino", "Funciona (88–89 ítems)"],
     ["GDELT DOC 2.0 API", "Noticias mundiales", "Funciona y tiene historial 2023–2024, pero con límite de uso estricto (HTTP 429 frecuentes)."],
     ["MITRE ATT&CK (STIX)", "Catálogo de técnicas", "Funciona (descarga oficial desde github.com/mitre/cti)."],
+    ["Telegram: LulzSec Muslims y LulzSec Black", "Canales públicos de los grupos (reclamos)", "Agregados el 30/10/2026 (decisión D34); se leen desde la vista web pública, sin cuenta."],
   ], [2300, 2000, 5338]),
   espacio(),
   P("Ninguna fuente tuvo que descartarse. Las direcciones que fallaron se reemplazaron por las alternativas que sí funcionan."),
@@ -237,7 +238,12 @@ add(
   V("Tramos de **2 días** para la consulta geopolítica y de **30 días** para la ciber: 196 consultas en total."),
   V("**Descarga por partes y reanudable:** cada ejecución trabaja como máximo 40 minutos, guarda el progreso y se detiene antes si GDELT rechaza 3 consultas seguidas. Un workflow dedicado la repite cada hora hasta completarla."),
   P("Un diagnóstico posterior confirmó que, para el monitoreo **en vivo**, los feeds RSS son la fuente principal y GDELT es complementario. GDELT aporta su mayor valor en el **análisis histórico**."),
-  H2("5.3. Archivos de carga manual"),
+  H2("5.3. Canales de Telegram de los grupos"),
+  P("Como el hacktivismo se anuncia sobre todo en Telegram, el autor identificó tres espacios: los canales públicos de **LulzSec Muslims** y **LulzSec Black**, y un grupo privado. Se eligió monitorear solo los **canales públicos**, leyendo su vista web (t.me/s/<canal>), la misma que ve cualquier persona sin iniciar sesión. El grupo privado quedó fuera porque exigiría entrar con una cuenta y publicar en un repositorio público contenido de un espacio cerrado (decisión D34)."),
+  V("Un mensaje cuenta como **ataque reclamado** si menciona a Argentina, un dominio .ar o la bandera argentina, y además tiene una señal de ataque (por ejemplo \"down\", un enlace a check-host o un término cibernético)."),
+  V("Es la palabra del propio grupo: se muestra como **reclamo sin verificar** y forma un grupo aparte en la evaluación. Para usarlo como incidente debe pasar por la verificación del autor."),
+  V("Solo se guarda el texto recortado y el enlace al mensaje; nunca archivos ni enlaces de descarga."),
+  H2("5.4. Archivos de carga manual"),
   P("Dado que los grupos hacktivistas anuncian sus ataques mayormente en Telegram o X (fuera del alcance de la Fase 1), se crearon dos archivos CSV editables desde GitHub:"),
   V("`datos/hechos_clave.csv`: 8 hechos geopolíticos de referencia (7 de octubre de 2023, balotaje, asunción presidencial, visita a Israel y anuncio sobre la embajada, fallo AMIA, ataque iraní a Israel, declaración de Hamás como organización terrorista, 30.º aniversario de la AMIA). Están marcados como **no verificados** hasta que el autor confirme fechas y fuentes."),
   V("`datos/incidentes_historicos.csv`: ataques conocidos. Se entregó solo con una fila de ejemplo (que se ignora); **no se inventaron incidentes**. Su carga es la próxima tarea del autor."),
@@ -253,7 +259,7 @@ add(
 
 // 5.4 Búsqueda inicial de incidentes
 add(
-  H2("5.4. Búsqueda inicial de incidentes (pendiente de validación)"),
+  H2("5.5. Búsqueda inicial de incidentes (pendiente de validación)"),
   P("El 13/10/2026 se realizó una búsqueda inicial en fuentes abiertas para identificar ataques del período de estudio. Se consultaron medios argentinos, sitios especializados en inteligencia de amenazas e informes de empresas de seguridad (Radware, Check Point, Group-IB, entre otros). Los resultados son **candidatos**: ninguno se cargó en el archivo de incidentes hasta que el autor los valide."),
   tabla(["Fecha", "Grupo", "Objetivo / tipo", "Fuentes encontradas", "Observaciones"], [
     ["Agosto 2023 (día sin precisar)", "Cyber Dragonz", "Biblioteca del Congreso de la Nación · defacement", "C5N, que cita a mefiltraron.com", "Señalado como el primer ataque al país vinculado al conflicto Israel–Palestina. Fuente secundaria: falta la fecha exacta."],
@@ -287,6 +293,7 @@ add(
   P("Una noticia es de **ataque** si contiene al menos un término cibernético **y** menciona a Argentina (o un dominio `.gob.ar`). Entre los términos están: hackeo, hackers, ciberataque, filtración de datos, defacement, sitio caído, DDoS, hacktivistas, ransomware, gob.ar y los nombres de los grupos (Cyber Dragonz, LulzSec Muslims, REM, Ripper Sec, Anonymous Sudan, Mysterious Team, Team Insane PK)."),
   V("La sigla **REM** solo cuenta si aparece en MAYÚSCULAS, para evitar falsos positivos (por ejemplo, la «fase REM» del sueño)."),
   V("Se descartaron términos demasiado genéricos como «filtración» a secas, que en la prensa argentina se usa mucho para filtraciones políticas."),
+  V("Para los **mensajes de los canales de Telegram de los grupos** rige una regla propia: alcanza con que mencionen a Argentina, un dominio .ar o la bandera y tengan una señal de reclamo (como «down», «leak» o un enlace a check-host), porque el canal ya es el contexto cibernético (sección 5.3)."),
   H2("6.3. Mapeo a MITRE ATT&CK"),
   P("A cada noticia de ataque se le asignan técnicas de la matriz Enterprise ATT&CK según las expresiones que contiene. Los nombres oficiales se descargan de MITRE en cada ejecución."),
   tabla(["Categoría", "Técnicas asignadas"], mapeo.reglas.map((r) => [r.categoria,
@@ -298,27 +305,31 @@ const S = config.semaforo;
 add(
   H1("7. El semáforo de alertas"),
   H2("7.1. Reglas"),
-  N(`**Día detonante:** hay noticias geopolíticas relevantes de al menos **${S.min_fuentes_distintas_por_dia} fuentes distintas** (corroboración independiente), o hay un hecho clave cargado a mano.`, "numeros3"),
+  N(`**Día detonante (modo «${S.modo_detonantes}»):** solo abren ventana los **hechos clave** de \`datos/hechos_clave.csv\`, revisados por el analista. Las noticias geopolíticas que antes abrían ventana por sí solas (al menos ${S.min_fuentes_distintas_por_dia} fuentes distintas el mismo día) ahora se proponen como **candidatos**: una fila por día en \`datos/candidatos_hechos_clave.csv\`, con la noticia de mayor puntaje y la cantidad de noticias y fuentes. El autor las revisa y, si corresponde, las pasa a mano a los hechos clave (decisión D35).`, "numeros3"),
   N(`**Ventana de vigilancia:** cada día detonante abre una ventana de **${S.ventana_vigilancia_dias} días**. Si aparece otro detonante con la ventana abierta, la ventana se extiende.`, "numeros3"),
   N("**Amarillo:** el día está dentro de una ventana y todavía no hubo ataques.", "numeros3"),
   N("**Rojo:** dentro de la ventana apareció al menos un ataque contra objetivos argentinos. El nivel se mantiene en rojo hasta que la ventana se cierra.", "numeros3"),
   N("**Verde:** el día no está dentro de ninguna ventana.", "numeros3"),
   N("**Alerta informativa:** un ataque fuera de toda ventana no cambia el semáforo, pero se informa, porque sirve para evaluar el modelo (posibles detonantes no detectados).", "numeros3"),
+  N("**Alcance:** desde el 30/10/2026 la plataforma se centra en **LulzSec**. En la línea de tiempo, el semáforo y las alertas solo cuentan los ataques de este actor (incidentes que lo nombran, reclamos de sus canales de Telegram y noticias que lo mencionan). Los ataques de otros actores no se muestran, pero se conservan como **grupo de comparación** de la evaluación (decisión D36).", "numeros3"),
+  P("**Por qué se pasó a detonantes curados.** Con la regla automática, al avanzar la descarga de GDELT, casi cualquier noticia que mencionara a Argentina junto con AMIA o Irán abría una ventana: las ventanas se encadenaban y llegaron a cubrir más de la mitad de los días, con lo que una alerta dejaba de informar algo (la razón de los hacktivistas quedó cerca de 1, es decir, del azar). Con los hechos clave curados, la cobertura baja a menos de un cuarto de los días (sección 15.5)."),
+  P("**Consecuencia para el monitoreo en vivo:** el semáforo ya no se enciende solo con las noticias; se pone en amarillo cuando el analista carga un hecho clave. La lista de candidatos funciona como bandeja de entrada de la alerta temprana."),
   H2("7.2. Ejemplo"),
   tabla(["Fecha", "Qué ocurre", "Nivel"], [
-    ["6 feb 2024", "Visita a Israel y anuncio sobre la embajada (hecho detonante)", "Amarillo — ventana hasta el 13 feb"],
-    ["7–8 feb", "Sin ataques registrados", "Amarillo"],
-    ["9 feb", "Se registra un ataque contra un sitio .gob.ar (ejemplo ilustrativo)", "Rojo"],
-    ["10–13 feb", "Ventana todavía abierta", "Rojo"],
-    ["14 feb", "La ventana se cierra", "Verde"],
+    ["6 feb 2024", "Visita de Milei a Israel y anuncio sobre la embajada (hecho clave)", "Amarillo — ventana de 21 días, hasta el 27 feb"],
+    ["7–21 feb", "Sin ataques de LulzSec registrados", "Amarillo"],
+    ["22 feb", "LulzSec Muslims reivindica un ataque a las Fuerzas Armadas (INC-002, verificado D3)", "Rojo"],
+    ["23–27 feb", "Ventana todavía abierta", "Rojo"],
+    ["28 feb", "La ventana se cierra", "Verde"],
   ], [1600, 5238, 2800]),
   espacio(),
   P("Este comportamiento está cubierto por las pruebas automáticas del proyecto (ver capítulo 10)."),
   H2("7.3. Parámetros configurables"),
   tabla(["Parámetro (config.json)", "Valor actual", "Qué controla"], [
-    ["ventana_vigilancia_dias", String(S.ventana_vigilancia_dias), "Duración de la ventana de vigilancia"],
+    ["modo_detonantes", String(S.modo_detonantes), "«curado»: solo hechos clave abren ventana; «automatico»: también las noticias de varias fuentes"],
+    ["ventana_vigilancia_dias", String(S.ventana_vigilancia_dias), "Duración de la ventana de vigilancia (antes 7; 21 desde el 30/10/2026)"],
     ["umbral_puntaje_detonante", String(S.umbral_puntaje_detonante), "Puntaje mínimo para que una noticia sea geopolítica relevante"],
-    ["min_fuentes_distintas_por_dia", String(S.min_fuentes_distintas_por_dia), "Corroboración: fuentes distintas necesarias para un día detonante"],
+    ["min_fuentes_distintas_por_dia", String(S.min_fuentes_distintas_por_dia), "Corroboración: fuentes distintas para proponer un día como candidato (o detonante en modo automático)"],
     ["dias_modo_vivo", String(S.dias_modo_vivo), "Días que muestra el modo en vivo"],
   ], [3200, 1400, 5038]),
 );
@@ -445,6 +456,9 @@ add(
     ["D31", "Un evento por día en noticias detectadas", "Evitar contar varias veces el mismo ataque"],
     ["D32", "Resultados que cambian con el histórico", "Interpretación prudente y recalibración"],
     ["D33", "Incidentes descartados con motivo, fuera del cálculo", "Trazabilidad del análisis"],
+    ["D34", "Canales públicos de Telegram de los grupos como fuente de reclamos", "El hacktivismo se anuncia en Telegram"],
+    ["D35", "Detonantes curados, ventana de 21 días y validación por tramos", "Reducir el ruido de las ventanas encadenadas"],
+    ["D36", "Plataforma centrada en LulzSec; otros actores solo como comparación", "Decisión del autor sobre el alcance"],
   ], [1100, 4600, 3938]),
 );
 
@@ -460,9 +474,10 @@ add(
   N("**Verificar los 8 hechos clave:** confirmar fechas, completar `fuente_url` y marcar `verificado = si`.", "numeros5"),
   N("Completar el nombre del autor en la portada de esta memoria.", "numeros5"),
   N("**Completar la verificación:** quedan 6 incidentes (entre ellos INC-013, Stucx Team, sin fecha) y los 16 hechos clave (sección 14.6). Todos los hacktivistas con fecha ya están verificados.", "numeros5"),
+  N("**Verificar los 16 hechos clave**, que desde el 30/10/2026 son los únicos detonantes del semáforo, y **revisar los candidatos** propuestos automáticamente en `datos/candidatos_hechos_clave.csv` (una fila por día).", "numeros5"),
   H2("13.3. Próximos pasos propuestos"),
   V("**Evaluación del modelo:** proporción de ataques ocurridos dentro de ventanas de vigilancia, días de anticipación entre detonante y ataque, y alertas sin ataques posteriores."),
-  V("**Análisis de sensibilidad:** comparar ventanas de 3, 7 y 14 días y distintos umbrales."),
+  V("**Análisis de sensibilidad:** hecho (ventanas de 3 a 30 días, detonantes automáticos frente a curados, tramos de calibración y validación; sección 15.5). Queda repetirlo cuando aparezcan ataques de LulzSec en el tramo de validación."),
   V("**Fase 2:** clasificación con Claude Haiku 5.5, informe de inteligencia con Claude Sonnet 5.5 y comparación con las reglas de la Fase 1."),
 );
 
@@ -549,6 +564,34 @@ const datosWeb = JSON.parse(fs.readFileSync(path.join(RAIZ, "web", "datos.json")
 const evTodas = datosWeb.evaluacion.todos || datosWeb.evaluacion;
 const evFiltro = datosWeb.evaluacion.confianza_media_alta;
 const ev = evTodas;
+// Tabla «antes / después»: detonantes automáticos frente a curados, por tramo (solo verificados).
+function comparacionModos() {
+  const comp = (datosWeb.comparacion_modos || {}).verificados;
+  if (!comp) return [];
+  const c2 = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n}` + (x.razon !== null ? ` · ${x.razon}` : "");
+  const tablaTramo = (t) => {
+    const a = comp.automatico[t], c = comp.curado[t];
+    return [H3(`${c.nombre} (${c.inicio} a ${c.fin}) · días detonantes: ${a.detonantes} automáticos → ${c.detonantes} curados`),
+      tabla(["Ventana", "Cobertura antes", "LulzSec antes", "Cibercrim. antes", "Cobertura ahora", "LulzSec ahora", "Cibercrim. ahora"],
+        c.ventanas.map((vc, i) => { const va = a.ventanas[i];
+          return [`${vc.ventana_dias} días`, `${va.cobertura_pct} %`, c2(va.grupos.lulzsec), c2(va.grupos.cibercriminal),
+                  `${vc.cobertura_pct} %`, c2(vc.grupos.lulzsec), c2(vc.grupos.cibercriminal)]; }),
+        [1100, 1350, 1400, 1400, 1350, 1400, 1638]),
+      espacio()];
+  };
+  return [
+    H2("15.5. Detonantes curados: antes y después"),
+    P("El 30/10/2026 el autor pidió cambiar la definición de día detonante (decisión D35). La tabla compara, con los incidentes **verificados**, la regla anterior (**automática**: noticias de 2 o más fuentes el mismo día, o un hecho clave) con la nueva (**curada**: solo los hechos clave). Cada celda muestra ataques dentro de una ventana / total · razón. Se separan dos tramos: la **calibración** (agosto 2023 – diciembre 2024, el período con el que se ajustaron las reglas) y la **validación** (2025 – hoy, datos que no se usaron para ajustarlas)."),
+    ...["total", "calibracion", "validacion"].filter((t) => comp.curado[t]).flatMap(tablaTramo),
+    P("**Lectura:**"),
+    V("Con la regla automática las ventanas cubrían entre la mitad y casi todo el período, y la razón de LulzSec quedaba cerca de 1: la alerta no se distinguía del azar. Con los hechos clave curados, la cobertura baja a un cuarto de los días y, con ventanas de 21 y 30 días, LulzSec cae dentro en 3 y 4 de sus 4 ataques (razón cercana a 3), mientras los cibercriminales quedan por debajo de 1."),
+    V("Con ventanas de 3 y 7 días ningún ataque de LulzSec cae dentro: los ataques ocurren **entre dos y cuatro semanas** después del hecho. Por eso el semáforo pasó a 21 días."),
+    V("El autor hizo antes una simulación propia con los 5 hacktivistas verificados (los 4 de LulzSec e INC-020): 7 días, cobertura 10,2 % y 0 de 5; 14 días, 17,6 % y 1 de 5; 21 días, 23,3 % y 4 de 5 (razón 3,4); 30 días, 29,4 % y 5 de 5 (razón 3,4). La evaluación de la plataforma reproduce esos valores; las diferencias de una décima se deben a que el período llega a una fecha posterior."),
+    V("**Límites de la validación:** los 4 ataques de LulzSec son de 2024, es decir, del tramo de calibración. En el tramo de validación **no hay ningún ataque de LulzSec**, de modo que la hipótesis no puede validarse todavía fuera de los datos con los que se ajustó. Además, el tamaño de la ventana (21 días) se eligió mirando todo el período, y los 16 hechos clave todavía **no están verificados** por el autor: todo el resultado depende de esa lista."),
+    nota("Resultado indicativo con muy pocos casos (4 ataques de LulzSec verificados). Sirve para mostrar el método y su mejora frente a la regla automática, no para afirmar una relación causal."),
+  ];
+}
+
 const celdaEv = (x) => !x || !x.n ? "—" : `${x.dentro}/${x.n} (${x.pct_dentro} %)` + (x.razon !== null ? `\nrazón ${x.razon}` : "");
 add(
   H1("15. Evaluación del modelo"),
@@ -556,24 +599,27 @@ add(
   P("Para cada tamaño de ventana y cada tipo de actor se calcula cuántos ataques ocurrieron **dentro** de una ventana de vigilancia. Ese porcentaje se compara con la **cobertura**, es decir, el porcentaje de días del período cubiertos por ventanas: es lo que se esperaría si los ataques ocurrieran al azar. La **razón** entre ambos resume el resultado:"),
   V("**Razón mayor que 1:** ese tipo de actor ataca dentro de las ventanas más de lo esperable por azar (evidencia a favor de la hipótesis)."),
   V("**Razón cercana a 1:** no hay relación con los hechos detonantes. Es lo esperado para el grupo de comparación (cibercriminales)."),
-  P("Se evalúan ventanas de 3, 7, 14 y 21 días (**análisis de sensibilidad**). La de 7 días es la que usa el semáforo."),
+  P(`Se evalúan ventanas de ${config.evaluacion.ventanas_sensibilidad.join(", ")} días (**análisis de sensibilidad**). La de ${S.ventana_vigilancia_dias} días es la que usa el semáforo.`),
+  P("Desde el 30/10/2026 el grupo foco es **LulzSec**. Los ataques de otros actores (otros hacktivistas, cibercriminales, desconocidos) no se muestran en la plataforma, pero se mantienen aquí como **grupo de comparación**: sin él no se podría saber si la razón de LulzSec supera al azar por algo más que casualidad."),
   H2("15.2. Resultados preliminares"),
   P(`Período evaluado: ${ev.inicio} a ${ev.fin} (${ev.dias} días, ${ev.detonantes} días detonantes). Datos al ${datosWeb.generado.slice(0, 10)}.`),
   ...[["todos", "Con todos los incidentes"], ["confianza_media_alta", "Solo incidentes de confianza media o alta (robustez)"], ["verificados", "Solo incidentes verificados por el autor"]]
     .filter(([k]) => datosWeb.evaluacion[k]).flatMap(([k, titulo]) => [
       H3(titulo),
-      tabla(["Ventana", "Cobertura", "Hacktivista", "Cibercriminal", "Desconocido"],
-        datosWeb.evaluacion[k].ventanas.map((v) => [`${v.ventana_dias} días`, `${v.cobertura_pct} %`, celdaEv(v.grupos.hacktivista), celdaEv(v.grupos.cibercriminal), celdaEv(v.grupos.desconocido)]),
-        [1500, 1500, 2300, 2169, 2169]),
+      tabla(["Ventana", "Cobertura", "LulzSec (foco)", "Otros hacktivistas", "Cibercriminal", "Desconocido"],
+        datosWeb.evaluacion[k].ventanas.map((v) => [`${v.ventana_dias} días`, `${v.cobertura_pct} %`, celdaEv(v.grupos.lulzsec), celdaEv(v.grupos.hacktivista), celdaEv(v.grupos.cibercriminal), celdaEv(v.grupos.desconocido)]),
+        [1200, 1200, 1900, 1800, 1769, 1769]),
       espacio(),
     ]),
-  ...figura("web_evaluacion.png", "Sección «Evaluación del modelo» en la página, con los incidentes sin fecha al pie."),
+  ...figura("web_evaluacion.png", "Sección «Evaluación del modelo» en la página (30/10/2026): LulzSec como grupo foco, los demás actores como comparación y la tabla «antes y después» de los detonantes curados."),
   H2("15.3. Lectura de los resultados"),
   P("Los resultados **cambian a medida que se completa el histórico de GDELT** (decisión D32). Conviene leerlos como una foto de cada momento:"),
   tabla(["Fecha", "Datos", "Hacktivistas (21 días)", "Cibercriminales (21 días)"], [
     ["14/10/2026", "~199 eventos geopolíticos; 23 incidentes", "razón 1,92 (todos) · 1,68 (media/alta)", "razón 0,75 · 0,84"],
     ["18/10/2026 (mañana)", "~691 eventos geopolíticos; 10 incidentes verificados", "razón 1,57 (todos) · 1,38 (media/alta)", "razón 0,92 · 1,38"],
     ["18/10/2026 (tarde)", "16 verificados, 3 descartados", "razón 1,83 (todos) · 2,20 (solo verificados)", "razón 0,92 · 0,46"],
+    ["24/10/2026", "~2.000 eventos geopolíticos; 227 días detonantes automáticos (ventana de 7 días)", "razón 1,16 (cobertura 51,6 %)", "razón 1,29 (verificados)"],
+    ["30/10/2026", "Detonantes curados (16 hechos clave), ventana de 21 días, foco LulzSec", "LulzSec 3 de 4 · razón 3,24 (cobertura 23,2 %)", "razón 0,72 (verificados)"],
   ], [1400, 3000, 2700, 2538]),
   espacio(),
   V("Con más noticias detonantes, las ventanas cubren más días (con 21 días, cerca del 36 % del período). Así la ventaja de los hacktivistas se achica y, con confianza media o alta, se iguala a la de los cibercriminales. **La hipótesis no puede confirmarse con los datos actuales.**"),
@@ -583,6 +629,7 @@ add(
   V("Si la cobertura sigue creciendo al completarse el histórico, habrá que **recalibrar el umbral de detonante** (por ejemplo, exigir 3 fuentes distintas por día) para que las ventanas sigan siendo selectivas."),
   V("**Falsos positivos observados:** el defacement de argentina.gob.ar (19/10/2023), de motivación interna, dentro de la ventana posterior al 7 de octubre; y una noticia sobre la detención de personas que amenazaron con bombas, clasificada como ataque por las palabras clave."),
   nota("**Advertencia:** son muy pocos incidentes y casi todos sin verificar. Estos números ilustran el **método**; no permiten conclusiones. Al completarse el histórico de GDELT y verificarse los incidentes, la tabla se recalcula sola."),
+  ...comparacionModos(),
   H2("15.4. Extensión del período hasta la actualidad"),
   P("A pedido del autor, el período histórico se extendió a **01/08/2023 – 11/10/2026** (el día anterior al inicio del monitoreo en vivo). El caso de estudio original se mantiene como período predefinido en la página. La descarga de GDELT conserva lo ya obtenido y pasa de 196 a 623 tramos, por lo que tardará varios días más en completarse."),
   ...figura("web_periodo_completo.png", "Vista del período completo (agosto 2023 – hoy) con los incidentes cargados y la descarga de GDELT todavía en curso."),

@@ -1,10 +1,14 @@
 """Lógica del semáforo de alertas (Fase 1: reglas de palabras clave + fechas).
 
 Reglas:
-1. Un DÍA es "detonante" si ese día hay noticias geopolíticas relevantes
-   (puntaje >= umbral) publicadas por al menos `min_fuentes_distintas_por_dia`
-   fuentes distintas (corroboración), o si hay un hecho clave
-   cargado a mano (datos/hechos_clave.csv), que cuenta por sí solo.
+1. Un DÍA es "detonante" según `modo_detonantes`:
+   - "curado" (por defecto): solo los días con un hecho clave cargado a mano
+     (datos/hechos_clave.csv). Las noticias que en modo automático habrían sido
+     detonantes NO abren ventana: se proponen como candidatos (ver `candidatos_por_dia`)
+     para que el autor las revise.
+   - "automatico": además de los hechos clave, los días con noticias geopolíticas
+     relevantes (puntaje >= umbral) de al menos `min_fuentes_distintas_por_dia`
+     fuentes distintas (corroboración).
 2. Cada día detonante abre una VENTANA DE VIGILANCIA desde ese día hasta
    `ventana_vigilancia_dias` días después. Ventanas que se solapan se fusionan en
    un único "periodo de vigilancia" (un detonante nuevo extiende el plazo).
@@ -24,23 +28,39 @@ def _d(s: str) -> date:
     return date.fromisoformat(s[:10])
 
 
-def dias_detonantes(eventos: list[dict], min_por_dia: int) -> dict[str, list[str]]:
-    """{dia: [ids de eventos que lo hacen detonante]}"""
+def _detonantes_automaticos(eventos: list[dict], min_por_dia: int) -> dict[str, list[dict]]:
+    """{dia: [noticias]} con los días que cumplen la regla automática (sin contar hechos clave)."""
     por_dia = defaultdict(list)
+    for e in eventos:
+        if e["carril"] == "geo" and e["origen"] != "hecho_clave":
+            por_dia[e["dia"]].append(e)
+    # Corroboración: cuenta cada fuente (dominio/medio) una sola vez por día.
+    return {dia: evs for dia, evs in por_dia.items() if len({e["fuente"] for e in evs}) >= min_por_dia}
+
+
+def candidatos_por_dia(eventos: list[dict], min_por_dia: int) -> list[dict]:
+    """Un candidato a hecho clave por cada día que sería detonante en modo automático:
+    la noticia de mayor puntaje, más la cantidad de noticias y de fuentes de ese día."""
+    candidatos = []
+    for dia, evs in sorted(_detonantes_automaticos(eventos, min_por_dia).items()):
+        mejor = max(evs, key=lambda e: (e.get("puntaje_geo", 0), e.get("titulo", "")))
+        candidatos.append({"dia": dia, "titulo": mejor.get("titulo", ""), "fuente": mejor.get("fuente", ""),
+                           "url": mejor.get("url", ""), "puntaje": mejor.get("puntaje_geo", 0),
+                           "n_noticias": len(evs), "n_fuentes": len({e["fuente"] for e in evs})})
+    return candidatos
+
+
+def dias_detonantes(eventos: list[dict], min_por_dia: int, modo: str = "curado") -> dict[str, list[str]]:
+    """{dia: [ids de eventos que lo hacen detonante]}"""
     curados = defaultdict(list)
     for e in eventos:
-        if e["carril"] != "geo":
-            continue
-        if e["origen"] == "hecho_clave":
+        if e["carril"] == "geo" and e["origen"] == "hecho_clave":
             curados[e["dia"]].append(e["id"])
-        else:
-            por_dia[e["dia"]].append(e)
     resultado = {}
-    for dia, evs in por_dia.items():
-        # Corroboración: cuenta cada fuente (dominio/medio) una sola vez por día.
-        fuentes = {e["fuente"] for e in evs}
-        if len(fuentes) >= min_por_dia:
-            resultado[dia] = [e["id"] for e in evs]
+    if modo == "automatico":
+        resultado = {dia: [e["id"] for e in evs] for dia, evs in _detonantes_automaticos(eventos, min_por_dia).items()}
+    elif modo != "curado":
+        raise ValueError(f"modo_detonantes desconocido: {modo!r} (usar 'curado' o 'automatico')")
     for dia, ids in curados.items():
         resultado.setdefault(dia, [])
         resultado[dia] = ids + resultado[dia]
@@ -67,7 +87,8 @@ def periodos_vigilancia(detonantes: dict[str, list[str]], ventana: int) -> list[
 
 def calcular(eventos: list[dict], cfg_semaforo: dict, hoy: date) -> dict:
     ventana = cfg_semaforo["ventana_vigilancia_dias"]
-    detonantes = dias_detonantes(eventos, cfg_semaforo["min_fuentes_distintas_por_dia"])
+    detonantes = dias_detonantes(eventos, cfg_semaforo["min_fuentes_distintas_por_dia"],
+                                 cfg_semaforo.get("modo_detonantes", "curado"))
     periodos = periodos_vigilancia(detonantes, ventana)
 
     ataques_por_dia = defaultdict(list)
