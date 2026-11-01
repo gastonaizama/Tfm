@@ -1,5 +1,5 @@
 {
- "fecha": "2026-11-01T13:33:42+00:00",
+ "fecha": "2026-11-01T22:07:19+00:00",
  "fuentes": [
   {
    "nombre": "The Record",
@@ -76,9 +76,9 @@
   {
    "nombre": "GDELT DOC API",
    "url": "(Argentina OR argentino OR Argentine OR \"gob.ar\") (hackeo OR hackers OR ciberataque OR hacktivistas OR hacktivists OR cyberattack OR DDoS OR defacement OR \"filtración de datos\" OR \"data leak\")",
-   "ok": false,
+   "ok": true,
    "items": 0,
-   "detalle": "LimiteGdelt: GDELT: límite de consultas (HTTP 429)"
+   "detalle": ""
   }
  ]
 }
