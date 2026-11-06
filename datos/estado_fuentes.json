@@ -1,5 +1,5 @@
 {
- "fecha": "2026-11-06T06:56:10+00:00",
+ "fecha": "2026-11-06T19:29:10+00:00",
  "fuentes": [
   {
    "nombre": "The Record",
@@ -62,7 +62,7 @@
    "nombre": "Telegram · LulzSec Black",
    "url": "https://t.me/s/LulzSecBlack",
    "ok": true,
-   "items": 50,
+   "items": 52,
    "detalle": "",
    "http": 200
   },
@@ -76,9 +76,9 @@
   {
    "nombre": "GDELT DOC API",
    "url": "(Argentina OR argentino OR Argentine OR \"gob.ar\") (hackeo OR hackers OR ciberataque OR hacktivistas OR hacktivists OR cyberattack OR DDoS OR defacement OR \"filtración de datos\" OR \"data leak\")",
-   "ok": false,
-   "items": 0,
-   "detalle": "LimiteGdelt: GDELT: límite de consultas (HTTP 429)"
+   "ok": true,
+   "items": 1,
+   "detalle": ""
   }
  ]
 }
