@@ -1,5 +1,5 @@
 {
- "fecha": "2026-11-22T06:58:45+00:00",
+ "fecha": "2026-11-22T19:47:40+00:00",
  "fuentes": [
   {
    "nombre": "The Record",
@@ -45,7 +45,7 @@
    "nombre": "La Nación",
    "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml",
    "ok": true,
-   "items": 87,
+   "items": 91,
    "detalle": "",
    "http": 200
   },
@@ -62,7 +62,7 @@
    "nombre": "Telegram · LulzSec Black",
    "url": "https://t.me/s/LulzSecBlack",
    "ok": true,
-   "items": 51,
+   "items": 53,
    "detalle": "",
    "http": 200
   },
