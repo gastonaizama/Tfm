@@ -1,5 +1,5 @@
 {
- "fecha": "2026-11-23T07:48:21+00:00",
+ "fecha": "2026-11-23T23:59:19+00:00",
  "fuentes": [
   {
    "nombre": "The Record",
@@ -45,7 +45,7 @@
    "nombre": "La Nación",
    "url": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/?outputType=xml",
    "ok": true,
-   "items": 92,
+   "items": 90,
    "detalle": "",
    "http": 200
   },
@@ -62,16 +62,16 @@
    "nombre": "Telegram · LulzSec Black",
    "url": "https://t.me/s/LulzSecBlack",
    "ok": true,
-   "items": 53,
+   "items": 44,
    "detalle": "",
    "http": 200
   },
   {
    "nombre": "GDELT DOC API",
    "url": "(Argentina OR argentino OR Argentine OR Milei) (Israel OR Hamas OR Iran OR AMIA OR embajada OR embassy OR Palestina OR Palestinian OR Hezbollah)",
-   "ok": false,
-   "items": 0,
-   "detalle": "LimiteGdelt: GDELT: límite de consultas (HTTP 429)"
+   "ok": true,
+   "items": 4,
+   "detalle": ""
   },
   {
    "nombre": "GDELT DOC API",
