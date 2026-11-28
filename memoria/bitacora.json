@@ -55,6 +55,11 @@
       "version": "0.10",
       "fecha": "31/10/2026",
       "cambios": "Perfil del actor LulzSec Muslims en la página web."
+    },
+    {
+      "version": "0.11",
+      "fecha": "28/11/2026",
+      "cambios": "Primer hecho clave del período en vivo (HC-017): el semáforo en vivo pasa a amarillo."
     }
   ],
   "eventos": [
@@ -327,6 +332,12 @@
       "tipo": "Web",
       "titulo": "Perfil del actor: LulzSec Muslims",
       "detalle": "Nueva sección de la página, debajo del semáforo, con la ficha del actor: quién es, motivación, objetivos en Argentina, técnicas MITRE (T1213, T1567, T1491.002, T1485), historial de sus 4 ataques con el hecho clave previo y los días transcurridos, el resultado de la evaluación con la ventana del semáforo (3 de 4 dentro, razón 3,24) y las limitaciones. El historial y el resultado se calculan desde datos.json."
+    },
+    {
+      "fecha": "28/11/2026",
+      "tipo": "Datos",
+      "titulo": "Primer hecho clave cargado desde la bandeja de candidatos (HC-017)",
+      "detalle": "Entre el 12/10 y el 28/11/2026 el monitor en vivo se mantuvo siempre en verde: en modo curado solo los hechos clave abren ventana, y la última ventana había cerrado el 10/05/2026. El autor revisó los 3 candidatos propuestos en ese período y confirmó el del 12/11: Irán declara organizaciones terroristas a la Armada y la Fuerza Aérea argentinas, en represalia por la designación de la Guardia Revolucionaria. Se carga con la fecha real del anuncio (11/11/2026) y fuente Buenos Aires Times. Abre una ventana de vigilancia de 21 días: el semáforo en vivo pasa a amarillo."
     }
   ]
 }
